@@ -1,58 +1,29 @@
-import { DeployButton } from "@/components/deploy-button"
-import { EnvVarWarning } from "@/components/env-var-warning"
-import { AuthButton } from "@/components/auth-button"
-import { Hero } from "@/components/hero"
-import { ThemeSwitcher } from "@/components/theme-switcher"
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps"
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps"
-import { hasEnvVars } from "@/lib/utils"
-import Link from "next/link"
-import { Suspense } from "react"
+import { AppLayout } from "@/components/layout/app-layout"
+import { BottomNav } from "@/components/layout/bottom-nav"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+/**
+ * 홈 화면 (대시보드)
+ * Task 001 - 빈 껍데기 구현
+ * Phase 2에서 실제 UI 구현 예정
+ */
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center">
-      <div className="flex w-full flex-1 flex-col items-center gap-20">
-        <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10">
-          <div className="flex w-full max-w-5xl items-center justify-between p-3 px-5 text-sm">
-            <div className="flex items-center gap-5 font-semibold">
-              <Link href={"/"}>Next.js Supabase Starter</Link>
-              <div className="flex items-center gap-2">
-                <DeployButton />
-              </div>
+    <AppLayout>
+      <div className="flex min-h-screen flex-col items-center justify-center p-6">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-center">대시보드</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center text-sm text-muted-foreground">
+              <p>영업이익 표시 영역</p>
+              <p className="mt-2">(Phase 2에서 구현 예정)</p>
             </div>
-            {!hasEnvVars ? (
-              <EnvVarWarning />
-            ) : (
-              <Suspense>
-                <AuthButton />
-              </Suspense>
-            )}
-          </div>
-        </nav>
-        <div className="flex max-w-5xl flex-1 flex-col gap-20 p-5">
-          <Hero />
-          <main className="flex flex-1 flex-col gap-6 px-4">
-            <h2 className="mb-4 text-xl font-medium">Next steps</h2>
-            {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-          </main>
-        </div>
-
-        <footer className="mx-auto flex w-full items-center justify-center gap-8 border-t py-16 text-center text-xs">
-          <p>
-            Powered by{" "}
-            <a
-              href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-              target="_blank"
-              className="font-bold hover:underline"
-              rel="noreferrer"
-            >
-              Supabase
-            </a>
-          </p>
-          <ThemeSwitcher />
-        </footer>
+          </CardContent>
+        </Card>
       </div>
-    </main>
+      <BottomNav />
+    </AppLayout>
   )
 }
