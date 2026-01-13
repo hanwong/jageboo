@@ -1,28 +1,37 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { RecurringTransactionCard } from "./recurring-transaction-card"
+import { EmptyState } from "@/components/common/empty-state"
 import type { RecurringTransaction } from "@/lib/types"
+import { RefreshCw } from "lucide-react"
 
 interface RecurringTransactionListProps {
   transactions: RecurringTransaction[]
-  onToggle?: (id: string, isActive: boolean) => void
+  onClick?: (id: string) => void
 }
 
 /**
  * 반복 거래 목록 컴포넌트
- * - Phase 2: UI만 구현 (Phase 3에서 실제 데이터 연동)
+ * - 반복 거래 카드 클릭 시 수정 페이지로 이동
  */
 export function RecurringTransactionList({
   transactions,
-  onToggle,
+  onClick,
 }: RecurringTransactionListProps) {
+  const router = useRouter()
+
   if (transactions.length === 0) {
     return (
-      <div className="py-12 text-center">
-        <p className="text-sm text-muted-foreground">
-          등록된 반복 거래가 없습니다.
-        </p>
-      </div>
+      <EmptyState
+        icon={RefreshCw}
+        title="등록된 반복 거래가 없습니다"
+        description="반복되는 수입이나 지출을 등록하세요"
+        action={{
+          label: "거래 입력하러 가기",
+          onClick: () => router.push("/"),
+        }}
+      />
     )
   }
 
@@ -32,7 +41,7 @@ export function RecurringTransactionList({
         <RecurringTransactionCard
           key={transaction.id}
           transaction={transaction}
-          onToggle={onToggle}
+          onClick={onClick}
         />
       ))}
     </div>

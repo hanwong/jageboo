@@ -50,7 +50,6 @@ export async function createRecurringTransactionAction(
       frequency: formData.get("frequency"),
       start_date: formData.get("start_date"),
       end_date: formData.get("end_date"),
-      is_active: formData.get("is_active"),
     }
 
     // amount를 숫자로 변환
@@ -78,7 +77,6 @@ export async function createRecurringTransactionAction(
       frequency: rawData.frequency,
       start_date: parsedStartDate,
       end_date: parsedEndDate,
-      is_active: rawData.is_active === "true",
     })
 
     if (!validated.success) {
@@ -101,7 +99,6 @@ export async function createRecurringTransactionAction(
         end_date: validated.data.end_date
           ? validated.data.end_date.toISOString().split("T")[0]
           : null,
-        is_active: validated.data.is_active,
       })
       .select()
       .single()
@@ -139,12 +136,13 @@ export async function createRecurringTransactionAction(
 }
 
 /**
- * 반복 거래 활성화/비활성화 토글 Server Action
+ * 반복 거래 수정 Server Action
  * F013: 반복 거래 관리
  */
-export async function toggleRecurringTransactionAction(
+export async function updateRecurringTransactionAction(
   id: string,
-  isActive: boolean
+  prevState: ActionResult,
+  formData: FormData
 ): Promise<ActionResult> {
   try {
     // 1. ID 검증
@@ -170,11 +168,62 @@ export async function toggleRecurringTransactionAction(
       }
     }
 
-    // 3. 데이터베이스 업데이트 (RLS에 의해 본인 거래만 수정 가능)
+    // 3. FormData 파싱
+    const rawData = {
+      type: formData.get("type"),
+      amount: formData.get("amount"),
+      memo: formData.get("memo"),
+      frequency: formData.get("frequency"),
+      start_date: formData.get("start_date"),
+      end_date: formData.get("end_date"),
+    }
+
+    // amount를 숫자로 변환
+    const parsedAmount =
+      typeof rawData.amount === "string"
+        ? parseFloat(rawData.amount)
+        : rawData.amount
+
+    // date를 Date 객체로 변환
+    const parsedStartDate =
+      typeof rawData.start_date === "string"
+        ? new Date(rawData.start_date)
+        : rawData.start_date
+
+    const parsedEndDate =
+      rawData.end_date && typeof rawData.end_date === "string"
+        ? new Date(rawData.end_date)
+        : null
+
+    // 4. Zod 검증
+    const validated = recurringTransactionFormSchema.safeParse({
+      type: rawData.type,
+      amount: parsedAmount,
+      memo: rawData.memo || null,
+      frequency: rawData.frequency,
+      start_date: parsedStartDate,
+      end_date: parsedEndDate,
+    })
+
+    if (!validated.success) {
+      return {
+        success: false,
+        errors: validated.error.flatten().fieldErrors,
+      }
+    }
+
+    // 5. 데이터베이스 업데이트 (RLS에 의해 본인 거래만 수정 가능)
     const { error: dbError } = await supabase
       .from("recurring_transactions")
       .update({
-        is_active: isActive,
+        type: validated.data.type,
+        amount: validated.data.amount,
+        memo: validated.data.memo,
+        frequency: validated.data.frequency,
+        start_date: validated.data.start_date.toISOString().split("T")[0],
+        end_date: validated.data.end_date
+          ? validated.data.end_date.toISOString().split("T")[0]
+          : null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
@@ -183,15 +232,26 @@ export async function toggleRecurringTransactionAction(
       console.error("Database error:", dbError)
       return {
         success: false,
-        error: "반복 거래 토글에 실패했습니다. 다시 시도해주세요.",
+        error: "반복 거래 수정에 실패했습니다. 다시 시도해주세요.",
       }
     }
 
-    // 4. 캐시 갱신
+    // 6. 캐시 갱신 및 리다이렉트
+    revalidatePath("/")
     revalidatePath("/settings")
-
-    return { success: true }
+    redirect("/settings")
   } catch (error) {
+    // redirect()는 NEXT_REDIRECT 에러를 던지므로 다시 throw
+    if (
+      error &&
+      typeof error === "object" &&
+      "message" in error &&
+      typeof error.message === "string" &&
+      error.message.includes("NEXT_REDIRECT")
+    ) {
+      throw error
+    }
+
     console.error("Unexpected error:", error)
     return {
       success: false,

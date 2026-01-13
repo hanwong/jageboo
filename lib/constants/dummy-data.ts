@@ -261,7 +261,6 @@ export const dummyRecurringTransactions: RecurringTransaction[] = [
     start_date: new Date(2026, 0, 1), // 1월 1일
     end_date: null,
     last_generated_at: new Date(2026, 0, 1),
-    is_active: true,
     created_at: new Date(),
     updated_at: new Date(),
   },
@@ -275,7 +274,6 @@ export const dummyRecurringTransactions: RecurringTransaction[] = [
     start_date: new Date(2026, 0, 1),
     end_date: null,
     last_generated_at: new Date(2026, 0, 1),
-    is_active: true,
     created_at: new Date(),
     updated_at: new Date(),
   },
@@ -289,7 +287,6 @@ export const dummyRecurringTransactions: RecurringTransaction[] = [
     start_date: new Date(2026, 0, 1),
     end_date: null,
     last_generated_at: new Date(2026, 0, 10),
-    is_active: false,
     created_at: new Date(),
     updated_at: new Date(),
   },

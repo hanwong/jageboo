@@ -34,39 +34,6 @@ export async function getAllRecurringTransactions(): Promise<
 }
 
 /**
- * 활성 반복 거래만 조회
- * @returns 활성 반복 거래 목록
- */
-export async function getActiveRecurringTransactions(): Promise<
-  RecurringTransaction[]
-> {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from("recurring_transactions")
-    .select("*")
-    .eq("is_active", true)
-    .order("created_at", { ascending: false })
-
-  if (error) {
-    console.error("Error fetching active recurring transactions:", error)
-    return []
-  }
-
-  // 날짜 문자열을 Date 객체로 변환
-  return data.map(transaction => ({
-    ...transaction,
-    start_date: new Date(transaction.start_date),
-    end_date: transaction.end_date ? new Date(transaction.end_date) : null,
-    last_generated_at: transaction.last_generated_at
-      ? new Date(transaction.last_generated_at)
-      : null,
-    created_at: new Date(transaction.created_at),
-    updated_at: new Date(transaction.updated_at),
-  }))
-}
-
-/**
  * 단일 반복 거래 조회
  * @param id 반복 거래 ID
  * @returns 반복 거래 데이터 또는 null

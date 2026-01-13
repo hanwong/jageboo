@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Trash2 } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -30,13 +31,24 @@ import {
   updateTransactionAction,
   deleteTransactionAction,
 } from "@/app/actions/transactions"
-import { createRecurringTransactionAction } from "@/app/actions/recurring-transactions"
+import {
+  createRecurringTransactionAction,
+  updateRecurringTransactionAction,
+  deleteRecurringTransactionAction,
+} from "@/app/actions/recurring-transactions"
 
 interface TransactionFormProps {
-  mode?: "create" | "edit"
+  mode?: "create" | "edit" | "recurring-edit"
   type: TransactionType
   transactionId?: string
   initialData?: TransactionFormData
+  // 반복 거래 수정 모드용 props
+  recurringId?: string
+  recurringInitialData?: {
+    frequency: "weekly" | "monthly"
+    start_date: Date
+    end_date?: Date | null
+  }
 }
 
 /**
@@ -53,23 +65,35 @@ export function TransactionForm({
   type,
   transactionId,
   initialData,
+  recurringId,
+  recurringInitialData,
 }: TransactionFormProps) {
   const router = useRouter()
   const amountInputRef = useRef<HTMLInputElement>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   // 반복 거래 상태
-  const [isRecurring, setIsRecurring] = useState(false)
-  const [frequency, setFrequency] = useState<"weekly" | "monthly">("monthly")
-  const [startDate, setStartDate] = useState<Date>(new Date())
-  const [hasEndDate, setHasEndDate] = useState(false)
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
+  const [isRecurring, setIsRecurring] = useState(mode === "recurring-edit")
+  const [frequency, setFrequency] = useState<"weekly" | "monthly">(
+    recurringInitialData?.frequency || "monthly"
+  )
+  const [startDate, setStartDate] = useState<Date>(
+    recurringInitialData?.start_date || new Date()
+  )
+  const [hasEndDate, setHasEndDate] = useState(
+    !!recurringInitialData?.end_date
+  )
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    recurringInitialData?.end_date || undefined
+  )
 
   // Server Action 상태 관리
   const [actionState, formAction, isPending] = useActionState(
     mode === "create"
       ? createTransactionAction
-      : updateTransactionAction.bind(null, transactionId || ""),
+      : mode === "recurring-edit"
+        ? updateRecurringTransactionAction.bind(null, recurringId || "")
+        : updateTransactionAction.bind(null, transactionId || ""),
     { success: false }
   )
 
@@ -96,10 +120,14 @@ export function TransactionForm({
 
   const dateValue = watch("date")
 
-  // 금액 입력 필드 자동 포커스
+  // 금액 입력 필드 자동 포커스 및 초기값 설정
   useEffect(() => {
+    // 수정 모드일 때 초기 금액 설정
+    if (initialData?.amount && amountInputRef.current) {
+      amountInputRef.current.value = initialData.amount.toLocaleString("ko-KR")
+    }
     amountInputRef.current?.focus()
-  }, [])
+  }, [initialData])
 
   // 서버 에러를 폼 필드에 반영 (일반 거래)
   useEffect(() => {
@@ -129,6 +157,32 @@ export function TransactionForm({
     }
   }, [recurringActionState.errors, setError])
 
+  // 일반 거래 성공 시 토스트 알림
+  useEffect(() => {
+    if (actionState.success) {
+      const message =
+        mode === "create"
+          ? "거래가 저장되었습니다"
+          : mode === "recurring-edit"
+            ? "반복 거래가 수정되었습니다"
+            : "거래가 수정되었습니다"
+      toast.success(message)
+      // redirect는 Server Action에서 처리됨
+    } else if (actionState.error) {
+      toast.error(actionState.error)
+    }
+  }, [actionState.success, actionState.error, mode])
+
+  // 반복 거래 성공 시 토스트 알림
+  useEffect(() => {
+    if (recurringActionState.success) {
+      toast.success("반복 거래가 등록되었습니다")
+      // redirect는 Server Action에서 처리됨
+    } else if (recurringActionState.error) {
+      toast.error(recurringActionState.error)
+    }
+  }, [recurringActionState.success, recurringActionState.error])
+
   // 폼 제출 핸들러
   const onSubmit = async (data: TransactionFormData) => {
     const formData = new FormData()
@@ -143,8 +197,15 @@ export function TransactionForm({
       if (hasEndDate && endDate) {
         formData.append("end_date", endDate.toISOString())
       }
-      formData.append("is_active", "true")
       recurringFormAction(formData)
+    } else if (mode === "recurring-edit") {
+      // 반복 거래 수정인 경우
+      formData.append("frequency", frequency)
+      formData.append("start_date", startDate.toISOString())
+      if (hasEndDate && endDate) {
+        formData.append("end_date", endDate.toISOString())
+      }
+      formAction(formData)
     } else {
       // 일반 거래인 경우
       formData.append("date", data.date.toISOString())
@@ -154,22 +215,45 @@ export function TransactionForm({
 
   // 취소 핸들러
   const handleCancel = () => {
-    router.push("/")
+    if (mode === "recurring-edit") {
+      router.push("/settings")
+    } else {
+      router.push("/")
+    }
   }
 
   // 삭제 핸들러
   const handleDelete = async () => {
-    if (!transactionId) return
+    if (mode === "recurring-edit") {
+      if (!recurringId) return
 
-    try {
-      const result = await deleteTransactionAction(transactionId)
-      if (!result.success && result.error) {
-        console.error("거래 삭제 실패:", result.error)
-        alert(result.error)
+      try {
+        const result = await deleteRecurringTransactionAction(recurringId)
+        if (result.success) {
+          toast.success("반복 거래가 삭제되었습니다")
+          router.push("/settings")
+        } else if (result.error) {
+          toast.error(result.error)
+        }
+      } catch (error) {
+        console.error("반복 거래 삭제 실패:", error)
+        toast.error("반복 거래 삭제 중 오류가 발생했습니다")
       }
-      // 성공 시 redirect가 Server Action에서 처리됨
-    } catch (error) {
-      console.error("거래 삭제 실패:", error)
+    } else {
+      if (!transactionId) return
+
+      try {
+        const result = await deleteTransactionAction(transactionId)
+        if (result.success) {
+          toast.success("거래가 삭제되었습니다")
+          // redirect가 Server Action에서 처리됨
+        } else if (result.error) {
+          toast.error(result.error)
+        }
+      } catch (error) {
+        console.error("거래 삭제 실패:", error)
+        toast.error("거래 삭제 중 오류가 발생했습니다")
+      }
     }
   }
 
@@ -209,23 +293,25 @@ export function TransactionForm({
         </div>
       )}
 
-      {/* 반복 거래 옵션 (create 모드에만 표시) */}
-      {mode === "create" && (
+      {/* 반복 거래 옵션 */}
+      {(mode === "create" || mode === "recurring-edit") && (
         <div className="space-y-4 rounded-lg border p-4">
-          {/* 반복 거래 활성화 체크박스 */}
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="recurring-enabled"
-              checked={isRecurring}
-              onCheckedChange={checked => setIsRecurring(checked === true)}
-            />
-            <Label
-              htmlFor="recurring-enabled"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              반복 거래로 등록
-            </Label>
-          </div>
+          {/* 반복 거래 활성화 체크박스 (create 모드에만) */}
+          {mode === "create" && (
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="recurring-enabled"
+                checked={isRecurring}
+                onCheckedChange={checked => setIsRecurring(checked === true)}
+              />
+              <Label
+                htmlFor="recurring-enabled"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                반복 거래로 등록
+              </Label>
+            </div>
+          )}
 
           {/* 반복 거래 활성화 시 추가 필드 */}
           {isRecurring && (
@@ -311,13 +397,6 @@ export function TransactionForm({
         </p>
       </div>
 
-      {/* 서버 에러 메시지 */}
-      {(actionState.error || recurringActionState.error) && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-          {actionState.error || recurringActionState.error}
-        </div>
-      )}
-
       {/* 버튼 그룹 */}
       <div className="space-y-3">
         {/* 저장/취소 버튼 */}
@@ -340,8 +419,8 @@ export function TransactionForm({
           </Button>
         </div>
 
-        {/* 삭제 버튼 (edit 모드에만 표시) */}
-        {mode === "edit" && (
+        {/* 삭제 버튼 (edit/recurring-edit 모드에만 표시) */}
+        {(mode === "edit" || mode === "recurring-edit") && (
           <Button
             type="button"
             variant="destructive"

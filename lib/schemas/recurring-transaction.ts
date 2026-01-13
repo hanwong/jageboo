@@ -42,7 +42,6 @@ export const recurringTransactionFormSchema = z
       })
       .optional()
       .nullable(),
-    is_active: z.boolean().default(true),
   })
   .refine(
     data => {
@@ -88,7 +87,6 @@ export const recurringTransactionUpdateSchema = z
       })
       .optional()
       .nullable(),
-    is_active: z.boolean().optional(),
   })
   .refine(
     data => {

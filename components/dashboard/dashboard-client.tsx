@@ -1,12 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { ProfitDisplay } from "./profit-display"
 import { SummaryCard } from "./summary-card"
 import { PeriodTabs } from "./period-tabs"
 import { TransactionList } from "@/components/transaction/transaction-list"
+import { RecurringTransactionList } from "@/components/recurring/recurring-transaction-list"
 import { createClient } from "@/lib/supabase/client"
-import type { Transaction } from "@/lib/types/database"
+import { filterRecurringByPeriod } from "@/lib/utils/recurring-filters"
+import type { Transaction, RecurringTransaction } from "@/lib/types/database"
 
 type Period = "daily" | "weekly" | "monthly"
 
@@ -17,6 +20,7 @@ interface DashboardClientProps {
     total_expense: number
     net_profit: number
   }
+  initialRecurringTransactions: RecurringTransaction[]
 }
 
 /**
@@ -27,11 +31,27 @@ interface DashboardClientProps {
 export function DashboardClient({
   initialTransactions,
   initialSummary,
+  initialRecurringTransactions,
 }: DashboardClientProps) {
+  const router = useRouter()
   const [selectedPeriod, setSelectedPeriod] = useState<Period>("daily")
   const [transactions, setTransactions] = useState(initialTransactions)
   const [summary, setSummary] = useState(initialSummary)
   const [isLoading, setIsLoading] = useState(false)
+
+  // 기간별 반복 거래 필터링
+  const filteredRecurringTransactions = useMemo(() => {
+    return filterRecurringByPeriod(
+      initialRecurringTransactions,
+      selectedPeriod,
+      new Date()
+    )
+  }, [initialRecurringTransactions, selectedPeriod])
+
+  // 반복 거래 클릭 핸들러
+  const handleRecurringClick = (id: string) => {
+    router.push(`/recurring/${id}/edit`)
+  }
 
   // 기간 변경 시 데이터 다시 가져오기
   useEffect(() => {
@@ -69,21 +89,14 @@ export function DashboardClient({
           updated_at: new Date(t.updated_at),
         }))
 
-        // 매출/매입 합계 계산
-        const totalIncome = formattedTransactions
-          .filter(t => t.type === "income")
-          .reduce((sum, t) => sum + Number(t.amount), 0)
-
-        const totalExpense = formattedTransactions
-          .filter(t => t.type === "expense")
-          .reduce((sum, t) => sum + Number(t.amount), 0)
+        // 반복 거래를 포함한 요약 데이터 조회 (API)
+        const summaryResponse = await fetch(
+          `/api/summary?period=${selectedPeriod}&date=${new Date().toISOString()}`
+        )
+        const summaryData = await summaryResponse.json()
 
         setTransactions(formattedTransactions)
-        setSummary({
-          total_income: totalIncome,
-          total_expense: totalExpense,
-          net_profit: totalIncome - totalExpense,
-        })
+        setSummary(summaryData)
       } finally {
         setIsLoading(false)
       }
@@ -113,6 +126,24 @@ export function DashboardClient({
       <div className="mb-6">
         <PeriodTabs value={selectedPeriod} onValueChange={setSelectedPeriod} />
       </div>
+
+      {/* 반복 거래 섹션 */}
+      {filteredRecurringTransactions.length > 0 && (
+        <div className="mb-6">
+          <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+            반복 거래
+          </h3>
+          <RecurringTransactionList
+            transactions={filteredRecurringTransactions}
+            onClick={handleRecurringClick}
+          />
+        </div>
+      )}
+
+      {/* 구분선 */}
+      {filteredRecurringTransactions.length > 0 && transactions.length > 0 && (
+        <div className="mb-6 border-t" />
+      )}
 
       {/* 거래 내역 리스트 */}
       {isLoading ? (

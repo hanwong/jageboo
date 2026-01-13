@@ -56,7 +56,6 @@ export interface RecurringTransaction {
   start_date: Date // DATE
   end_date: Date | null // DATE, nullable
   last_generated_at: Date | null // DATE, nullable
-  is_active: boolean // BOOLEAN (default: true)
   created_at: Date // TIMESTAMP
   updated_at: Date // TIMESTAMP
 }
