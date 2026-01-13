@@ -147,7 +147,7 @@ async function SlowChart() {
 ### 🔄 New: after() API 활용
 
 ```typescript
-import { after } from 'next/server'
+import { after } from "next/server"
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -175,7 +175,7 @@ export async function getProductData(id: string) {
     // 🔄 Next.js 15 새로운 캐시 옵션
     next: {
       revalidate: 3600, // 1시간 캐시
-      tags: [`product-${id}`, 'products'], // 태그 기반 무효화
+      tags: [`product-${id}`, "products"], // 태그 기반 무효화
     },
   })
 
@@ -183,14 +183,14 @@ export async function getProductData(id: string) {
 }
 
 // 캐시 무효화
-import { revalidateTag } from 'next/cache'
+import { revalidateTag } from "next/cache"
 
 export async function updateProduct(id: string, data: ProductData) {
   await updateDatabase(id, data)
 
   // 관련 캐시 무효화
   revalidateTag(`product-${id}`)
-  revalidateTag('products')
+  revalidateTag("products")
 }
 ```
 
@@ -198,7 +198,7 @@ export async function updateProduct(id: string, data: ProductData) {
 
 ```typescript
 // next.config.ts
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   // ✅ Turbopack 최적화 설정
@@ -206,18 +206,18 @@ const nextConfig: NextConfig = {
     turbo: {
       rules: {
         // CSS 모듈 최적화
-        '*.module.css': {
-          loaders: ['css-loader'],
-          as: 'css',
+        "*.module.css": {
+          loaders: ["css-loader"],
+          as: "css",
         },
       },
     },
     // 🔄 패키지 import 최적화
     optimizePackageImports: [
-      'lucide-react',
-      '@radix-ui/react-icons',
-      'date-fns',
-      'lodash-es',
+      "lucide-react",
+      "@radix-ui/react-icons",
+      "date-fns",
+      "lodash-es",
     ],
   },
 }
@@ -273,24 +273,24 @@ export default function UserForm() {
 
 ```typescript
 // middleware.ts
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server"
 
 // ⚠️ Edge Runtime에서 Node.js Runtime으로 변경
 export const config = {
-  runtime: 'nodejs', // 🔄 새로운 기본값
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  runtime: "nodejs", // 🔄 새로운 기본값
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 }
 
 export function middleware(request: NextRequest) {
   // 🔄 Node.js API 사용 가능
-  const crypto = require('crypto')
-  const hash = crypto.createHash('sha256')
+  const crypto = require("crypto")
+  const hash = crypto.createHash("sha256")
 
   // 인증 로직
-  const token = request.cookies.get('auth-token')?.value
+  const token = request.cookies.get("auth-token")?.value
 
   if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
   return NextResponse.next()
@@ -301,7 +301,7 @@ export function middleware(request: NextRequest) {
 
 ```typescript
 // app/api/admin/route.ts
-import { unauthorized, forbidden } from 'next/server'
+import { unauthorized, forbidden } from "next/server"
 
 export async function GET(request: Request) {
   const session = await getSession(request)

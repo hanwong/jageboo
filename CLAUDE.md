@@ -70,7 +70,7 @@ Future routes (per ROADMAP.md):
 
 ```typescript
 // Always create a new client per request (important for Fluid compute)
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from "@/lib/supabase/server"
 
 export default async function Page() {
   const supabase = await createClient()
@@ -84,7 +84,7 @@ export default async function Page() {
 **Client-side authentication:**
 
 ```typescript
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from "@/lib/supabase/client"
 
 export function Component() {
   const supabase = createClient()
@@ -166,7 +166,7 @@ export function InteractiveChart() {
 
 ```typescript
 // app/actions/transactions.ts
-'use server'
+"use server"
 
 export async function createTransactionAction(
   prevState: ActionResult,
@@ -174,7 +174,7 @@ export async function createTransactionAction(
 ): Promise<ActionResult> {
   // Always validate on server with Zod
   const validated = schema.safeParse({
-    amount: formData.get('amount'),
+    amount: formData.get("amount"),
   })
 
   if (!validated.success) {
@@ -262,10 +262,10 @@ export function TransactionForm() {
 
 ```typescript
 // lib/schemas/transaction.ts
-import { z } from 'zod'
+import { z } from "zod"
 
 export const transactionSchema = z.object({
-  amount: z.number().positive('금액은 0보다 커야 합니다'),
+  amount: z.number().positive("금액은 0보다 커야 합니다"),
   date: z.date(),
   memo: z.string().max(50).optional(),
 })
@@ -277,7 +277,7 @@ export type TransactionFormData = z.infer<typeof transactionSchema>
 
 ```typescript
 // app/actions/transactions.ts
-'use server'
+"use server"
 
 export async function createTransaction(
   prevState: ActionResult,
@@ -285,9 +285,9 @@ export async function createTransaction(
 ) {
   // Server-side validation
   const validated = transactionSchema.safeParse({
-    amount: Number(formData.get('amount')),
-    date: new Date(formData.get('date') as string),
-    memo: formData.get('memo'),
+    amount: Number(formData.get("amount")),
+    date: new Date(formData.get("date") as string),
+    memo: formData.get("memo"),
   })
 
   if (!validated.success) {
@@ -299,7 +299,7 @@ export async function createTransaction(
 
   // Database operation
   const supabase = await createClient()
-  await supabase.from('transactions').insert(validated.data)
+  await supabase.from("transactions").insert(validated.data)
 
   return { success: true }
 }

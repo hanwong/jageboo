@@ -1,28 +1,28 @@
-'use client'
+"use client"
 
-import { cn } from '@/lib/utils'
-import { createClient } from '@/lib/supabase/client'
-import { signInWithGoogle } from '@/app/actions/auth'
-import { Button } from '@/components/ui/button'
+import { cn } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
+import { signInWithGoogle } from "@/app/actions/auth"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect } from "react"
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+}: React.ComponentPropsWithoutRef<"div">) {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
@@ -31,7 +31,7 @@ export function LoginForm({
 
   // URL 쿼리 파라미터에서 에러 메시지 확인
   useEffect(() => {
-    const errorParam = searchParams.get('error')
+    const errorParam = searchParams.get("error")
     if (errorParam) {
       setError(decodeURIComponent(errorParam))
     }
@@ -50,9 +50,9 @@ export function LoginForm({
       })
       if (error) throw error
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push('/')
+      router.push("/")
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      setError(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setIsLoading(false)
     }
@@ -66,14 +66,14 @@ export function LoginForm({
       await signInWithGoogle()
     } catch (error: unknown) {
       setError(
-        error instanceof Error ? error.message : 'Google 로그인에 실패했습니다'
+        error instanceof Error ? error.message : "Google 로그인에 실패했습니다"
       )
       setIsGoogleLoading(false)
     }
   }
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -115,7 +115,7 @@ export function LoginForm({
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Login'}
+                {isLoading ? "Logging in..." : "Login"}
               </Button>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -135,7 +135,7 @@ export function LoginForm({
                 disabled={isGoogleLoading || isLoading}
               >
                 {isGoogleLoading ? (
-                  'Google 로그인 중...'
+                  "Google 로그인 중..."
                 ) : (
                   <>
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ export function LoginForm({
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{' '}
+              Don&apos;t have an account?{" "}
               <Link
                 href="/auth/sign-up"
                 className="underline underline-offset-4"

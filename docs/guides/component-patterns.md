@@ -8,7 +8,7 @@
 
 ```tsx
 // ✅ 각 컴포넌트가 하나의 명확한 책임
-export function UserAvatar({ user, size = 'md' }) {
+export function UserAvatar({ user, size = "md" }) {
   return (
     <Avatar className={avatarSizes[size]}>
       <AvatarImage src={user.avatar} alt={user.name} />
@@ -21,8 +21,8 @@ export function UserStatus({ isOnline }) {
   return (
     <div
       className={cn(
-        'h-3 w-3 rounded-full',
-        isOnline ? 'bg-green-500' : 'bg-gray-400'
+        "h-3 w-3 rounded-full",
+        isOnline ? "bg-green-500" : "bg-gray-400"
       )}
     />
   )
@@ -74,7 +74,7 @@ class UserCard extends BaseCard { ... }
 
 ```tsx
 // ✅ Server Component (데이터 패칭, SEO 중요)
-import { Suspense } from 'react'
+import { Suspense } from "react"
 
 export default async function UserListPage() {
   // 서버에서 데이터 패칭
@@ -105,14 +105,14 @@ async function UserList({ users }) {
 ### Client Components ('use client' 필요)
 
 ```tsx
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState, useEffect } from "react"
+import { useActionState } from "react"
 
 // ✅ Client Component (상호작용, 상태 관리)
 export function UserSearchForm() {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState("")
   const [results, setResults] = useState([])
 
   return (
@@ -131,14 +131,14 @@ export function UserSearchForm() {
 export function UserForm() {
   const [state, formAction, isPending] = useActionState(updateUserAction, {
     success: false,
-    message: '',
+    message: "",
   })
 
   return (
     <form action={formAction}>
       <input name="name" required />
       <button type="submit" disabled={isPending}>
-        {isPending ? '저장 중...' : '저장'}
+        {isPending ? "저장 중..." : "저장"}
       </button>
       {state.message && <p>{state.message}</p>}
     </form>
@@ -166,7 +166,7 @@ export default async function ProductPage({ params }) {
 }
 
 // 클라이언트 컴포넌트는 별도 파일로 분리
-;('use client')
+;("use client")
 export function ProductInteractions({ productId }) {
   const [liked, setLiked] = useState(false)
   // 상호작용 로직...
@@ -182,13 +182,13 @@ export function ProductInteractions({ productId }) {
 interface ButtonProps {
   children: React.ReactNode
   variant?:
-    | 'default'
-    | 'destructive'
-    | 'outline'
-    | 'secondary'
-    | 'ghost'
-    | 'link'
-  size?: 'default' | 'sm' | 'lg' | 'icon'
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link"
+  size?: "default" | "sm" | "lg" | "icon"
   disabled?: boolean
   loading?: boolean
   onClick?: () => void
@@ -197,8 +197,8 @@ interface ButtonProps {
 
 export function Button({
   children,
-  variant = 'default',
-  size = 'default',
+  variant = "default",
+  size = "default",
   disabled = false,
   loading = false,
   onClick,
@@ -298,27 +298,27 @@ export function DataFetcher<T>({ url, children }: DataFetcherProps<T>) {
 ### 1. 컴포넌트 변형 (Variants)
 
 ```tsx
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva, type VariantProps } from "class-variance-authority"
 
 // ✅ CVA로 변형 정의
 const cardVariants = cva(
-  'rounded-lg border bg-card text-card-foreground shadow-sm',
+  "rounded-lg border bg-card text-card-foreground shadow-sm",
   {
     variants: {
       variant: {
-        default: 'border-border',
-        outline: 'border-2',
-        ghost: 'border-transparent shadow-none',
+        default: "border-border",
+        outline: "border-2",
+        ghost: "border-transparent shadow-none",
       },
       size: {
-        sm: 'p-4',
-        md: 'p-6',
-        lg: 'p-8',
+        sm: "p-4",
+        md: "p-6",
+        lg: "p-8",
       },
     },
     defaultVariants: {
-      variant: 'default',
-      size: 'md',
+      variant: "default",
+      size: "md",
     },
   }
 )
@@ -354,7 +354,7 @@ interface AccordionContextType {
 
 const AccordionContext = createContext<AccordionContextType | null>(null)
 
-export function Accordion({ children, type = 'single' }) {
+export function Accordion({ children, type = "single" }) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set())
 
   const toggle = (value: string) => {
@@ -363,7 +363,7 @@ export function Accordion({ children, type = 'single' }) {
       if (newSet.has(value)) {
         newSet.delete(value)
       } else {
-        if (type === 'single') {
+        if (type === "single") {
           newSet.clear()
         }
         newSet.add(value)
@@ -413,7 +413,7 @@ export function AccordionContent({ children, value }) {
 ### 1. 메모이제이션
 
 ```tsx
-import { memo, useMemo, useCallback } from 'react'
+import { memo, useMemo, useCallback } from "react"
 
 // ✅ React.memo로 불필요한 리렌더링 방지
 export const ExpensiveComponent = memo(function ExpensiveComponent({
@@ -452,11 +452,11 @@ export const ExpensiveComponent = memo(function ExpensiveComponent({
 ### 2. 지연 로딩 (Lazy Loading)
 
 ```tsx
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense } from "react"
 
 // ✅ 동적 import로 코드 분할
-const HeavyComponent = lazy(() => import('./HeavyComponent'))
-const Chart = lazy(() => import('@/components/charts/Chart'))
+const HeavyComponent = lazy(() => import("./HeavyComponent"))
+const Chart = lazy(() => import("@/components/charts/Chart"))
 
 export function Dashboard() {
   return (
@@ -479,7 +479,7 @@ export function Dashboard() {
 
 ```tsx
 // ✅ 큰 리스트 가상화
-import { FixedSizeList as List } from 'react-window'
+import { FixedSizeList as List } from "react-window"
 
 interface VirtualizedListProps {
   items: any[]
@@ -531,7 +531,7 @@ export function Select<T>({
 }: SelectProps<T>) {
   return (
     <select
-      value={value ? getValue(value) : ''}
+      value={value ? getValue(value) : ""}
       onChange={e => {
         const selectedValue = options.find(
           option => getValue(option) === e.target.value
@@ -624,14 +624,14 @@ interface CartState {
 }
 
 type CartAction =
-  | { type: 'ADD_ITEM'; payload: CartItem }
-  | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
-  | { type: 'CLEAR_CART' }
+  | { type: "ADD_ITEM"; payload: CartItem }
+  | { type: "REMOVE_ITEM"; payload: string }
+  | { type: "UPDATE_QUANTITY"; payload: { id: string; quantity: number } }
+  | { type: "CLEAR_CART" }
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
-    case 'ADD_ITEM':
+    case "ADD_ITEM":
       return {
         ...state,
         items: [...state.items, action.payload],
@@ -661,7 +661,7 @@ export function CartProvider({ children }) {
 export function useCart() {
   const context = useContext(CartContext)
   if (!context) {
-    throw new Error('useCart must be used within CartProvider')
+    throw new Error("useCart must be used within CartProvider")
   }
   return context
 }
@@ -715,7 +715,7 @@ function UnnecessaryWrapper({ children }) {
 function BadComponent() {
   return (
     <ExpensiveComponent
-      config={{ option: 'value' }} // 매 렌더링마다 새 객체
+      config={{ option: "value" }} // 매 렌더링마다 새 객체
       onUpdate={() => {}} // 매 렌더링마다 새 함수
     />
   )
