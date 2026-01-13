@@ -34,7 +34,7 @@ export function RecurringTransactionCard({
 
   return (
     <Card
-      className="transition-all cursor-pointer hover:shadow-md"
+      className="cursor-pointer py-2 transition-all hover:shadow-md"
       onClick={handleCardClick}
     >
       <CardContent className="flex items-center justify-between p-4">

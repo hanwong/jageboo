@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Geist } from "next/font/google"
 import { ThemeProvider } from "next-themes"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 const defaultUrl = process.env.VERCEL_URL
@@ -9,8 +10,35 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "자영업자 장부 - 5초 만에 매입매출 기록",
+  description:
+    "1인 자영업자를 위한 초간편 매입/매출 관리 앱. 5초 만에 거래를 기록하고 실시간 영업이익을 확인하세요.",
+  keywords: [
+    "자영업자",
+    "장부",
+    "매입",
+    "매출",
+    "영업이익",
+    "거래 관리",
+    "가게 관리",
+  ],
+  authors: [{ name: "Jageboo" }],
+  openGraph: {
+    title: "자영업자 장부",
+    description: "5초 만에 매입매출을 기록하고 영업이익을 확인하세요",
+    type: "website",
+    locale: "ko_KR",
+  },
+  // PWA 설정
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "자영업자 장부",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 }
 
 const geistSans = Geist({
@@ -25,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -34,6 +62,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

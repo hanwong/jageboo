@@ -1,4 +1,8 @@
+"use client"
+
+import { useRouter } from "next/navigation"
 import { TransactionCard } from "./transaction-card"
+import { EmptyState } from "@/components/common/empty-state"
 import type { Transaction } from "@/lib/types"
 import { FileText } from "lucide-react"
 
@@ -17,19 +21,25 @@ export function TransactionList({
   transactions,
   className,
 }: TransactionListProps) {
+  const router = useRouter()
+
   // 빈 상태
   if (transactions.length === 0) {
     return (
       <div className={className}>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="mb-4 rounded-full bg-muted p-4">
-            <FileText className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h3 className="mb-2 text-lg font-semibold">거래 내역이 없습니다</h3>
-          <p className="text-sm text-muted-foreground">
-            아래 버튼을 눌러 매출 또는 매입을 등록해보세요
-          </p>
-        </div>
+        <EmptyState
+          icon={FileText}
+          title="거래 내역이 없습니다"
+          description="기록을 남기려면 매출 또는 매입을 입력하세요"
+          action={{
+            label: "매출 입력",
+            onClick: () => router.push("/income/new"),
+          }}
+          secondaryAction={{
+            label: "매입 입력",
+            onClick: () => router.push("/expense/new"),
+          }}
+        />
       </div>
     )
   }

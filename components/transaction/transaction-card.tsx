@@ -22,7 +22,7 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
 
   return (
     <Link href={`/transaction/${transaction.id}/edit`}>
-      <Card className="transition-shadow hover:shadow-md">
+      <Card className="py-2 transition-shadow hover:shadow-md">
         <CardContent className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <div

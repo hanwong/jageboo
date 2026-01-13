@@ -18,6 +18,7 @@ interface AmountInputProps extends Omit<
  * - 숫자 키패드 자동 포커스
  * - 금액 포맷팅 (천단위 콤마)
  * - 모바일 최적화
+ * - Enter 키 입력 시 폼 제출 (기본 HTML form 동작)
  */
 export const AmountInput = forwardRef<HTMLInputElement, AmountInputProps>(
   ({ label = "금액", error, className, ...props }, ref) => {
