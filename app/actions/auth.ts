@@ -49,7 +49,7 @@ export async function signOut() {
     throw error
   }
 
-  redirect("/auth/login")
+  redirect("/")
 }
 
 /**

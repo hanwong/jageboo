@@ -57,7 +57,7 @@ export function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <p>© 2024 자영업자 장부. All rights reserved.</p>
+        <p>© 2026 자영업자 장부. All rights reserved.</p>
       </footer>
     </div>
   )

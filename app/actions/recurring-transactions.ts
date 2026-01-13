@@ -113,7 +113,6 @@ export async function createRecurringTransactionAction(
 
     // 5. 캐시 갱신 및 리다이렉트
     revalidatePath("/")
-    revalidatePath("/settings")
     redirect("/")
   } catch (error) {
     // redirect()는 NEXT_REDIRECT 에러를 던지므로 다시 throw
@@ -238,8 +237,7 @@ export async function updateRecurringTransactionAction(
 
     // 6. 캐시 갱신 및 리다이렉트
     revalidatePath("/")
-    revalidatePath("/settings")
-    redirect("/settings")
+    redirect("/")
   } catch (error) {
     // redirect()는 NEXT_REDIRECT 에러를 던지므로 다시 throw
     if (
@@ -306,7 +304,7 @@ export async function deleteRecurringTransactionAction(
     }
 
     // 4. 캐시 갱신
-    revalidatePath("/settings")
+    revalidatePath("/")
 
     return { success: true }
   } catch (error) {

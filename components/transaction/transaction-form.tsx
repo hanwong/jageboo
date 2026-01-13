@@ -80,9 +80,7 @@ export function TransactionForm({
   const [startDate, setStartDate] = useState<Date>(
     recurringInitialData?.start_date || new Date()
   )
-  const [hasEndDate, setHasEndDate] = useState(
-    !!recurringInitialData?.end_date
-  )
+  const [hasEndDate, setHasEndDate] = useState(!!recurringInitialData?.end_date)
   const [endDate, setEndDate] = useState<Date | undefined>(
     recurringInitialData?.end_date || undefined
   )
@@ -216,7 +214,7 @@ export function TransactionForm({
   // 취소 핸들러
   const handleCancel = () => {
     if (mode === "recurring-edit") {
-      router.push("/settings")
+      router.push("/")
     } else {
       router.push("/")
     }
@@ -231,7 +229,7 @@ export function TransactionForm({
         const result = await deleteRecurringTransactionAction(recurringId)
         if (result.success) {
           toast.success("반복 거래가 삭제되었습니다")
-          router.push("/settings")
+          router.push("/")
         } else if (result.error) {
           toast.error(result.error)
         }

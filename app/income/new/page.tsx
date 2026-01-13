@@ -3,8 +3,9 @@ import { BottomNav } from "@/components/layout/bottom-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { TransactionForm } from "@/components/transaction/transaction-form"
+import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, TrendingUp } from "lucide-react"
 import { Suspense } from "react"
 
 /**
@@ -24,6 +25,9 @@ export default function NewIncomePage() {
             </Button>
           </Link>
           <h1 className="text-2xl font-bold">매출 입력</h1>
+          <div className={cn("bg-income-muted rounded-full p-2")}>
+            <TrendingUp className={cn("text-income h-4 w-4")} />
+          </div>
         </div>
 
         {/* 입력 폼 영역 */}
