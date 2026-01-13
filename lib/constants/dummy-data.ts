@@ -3,7 +3,7 @@
  * Phase 2 UI 개발용 샘플 데이터
  */
 
-import type { Transaction } from "@/lib/types"
+import type { Transaction, RecurringTransaction } from "@/lib/types"
 
 /**
  * 더미 거래 데이터
@@ -239,3 +239,58 @@ export function formatDate(date: Date): string {
 export function formatDateFull(date: Date): string {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`
 }
+
+/**
+ * ID로 거래 조회
+ */
+export function getTransactionById(id: string): Transaction | undefined {
+  return dummyTransactions.find(t => t.id === id)
+}
+
+/**
+ * 더미 반복 거래 데이터
+ */
+export const dummyRecurringTransactions: RecurringTransaction[] = [
+  {
+    id: "r1",
+    user_id: "dummy-user",
+    type: "expense",
+    amount: 300000,
+    memo: "월세",
+    frequency: "monthly",
+    start_date: new Date(2026, 0, 1), // 1월 1일
+    end_date: null,
+    last_generated_at: new Date(2026, 0, 1),
+    is_active: true,
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+  {
+    id: "r2",
+    user_id: "dummy-user",
+    type: "expense",
+    amount: 150000,
+    memo: "인터넷/전화",
+    frequency: "monthly",
+    start_date: new Date(2026, 0, 1),
+    end_date: null,
+    last_generated_at: new Date(2026, 0, 1),
+    is_active: true,
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+  {
+    id: "r3",
+    user_id: "dummy-user",
+    type: "income",
+    amount: 50000,
+    memo: "정기 배달",
+    frequency: "weekly",
+    start_date: new Date(2026, 0, 1),
+    end_date: null,
+    last_generated_at: new Date(2026, 0, 10),
+    is_active: false,
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+]
