@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import type { Transaction } from "@/lib/types/database"
+import type { Period } from "@/lib/types/transaction"
 
 /**
  * 단일 거래 조회
@@ -33,12 +34,12 @@ export async function getTransactionById(
 
 /**
  * 기간별 거래 조회
- * @param period 조회 기간 ('daily' | 'weekly' | 'monthly')
+ * @param period 조회 기간 ('daily' | 'weekly' | 'monthly' | 'yearly')
  * @param date 기준 날짜
  * @returns 거래 목록
  */
 export async function getTransactionsByPeriod(
-  period: "daily" | "weekly" | "monthly",
+  period: Period,
   date: Date
 ): Promise<Transaction[]> {
   const supabase = await createClient()
@@ -103,7 +104,7 @@ export async function getRecentTransactions(
  * 기간별 시작일/종료일 계산 헬퍼 함수
  */
 function calculatePeriodDates(
-  period: "daily" | "weekly" | "monthly",
+  period: Period,
   date: Date
 ): { startDate: string; endDate: string } {
   const year = date.getFullYear()
@@ -137,6 +138,16 @@ function calculatePeriodDates(
       // 이번 달 (1일 ~ 말일)
       const startDate = new Date(year, month, 1)
       const endDate = new Date(year, month + 1, 0) // 다음 달 0일 = 이번 달 마지막 날
+      return {
+        startDate: formatDateToYYYYMMDD(startDate),
+        endDate: formatDateToYYYYMMDD(endDate),
+      }
+    }
+
+    case "yearly": {
+      // 올해 (1월 1일 ~ 12월 31일)
+      const startDate = new Date(year, 0, 1) // January 1
+      const endDate = new Date(year, 11, 31) // December 31
       return {
         startDate: formatDateToYYYYMMDD(startDate),
         endDate: formatDateToYYYYMMDD(endDate),

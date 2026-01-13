@@ -1,8 +1,7 @@
 "use client"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-type Period = "daily" | "weekly" | "monthly"
+import type { Period } from "@/lib/types/transaction"
 
 interface PeriodTabsProps {
   value: Period
@@ -12,7 +11,7 @@ interface PeriodTabsProps {
 
 /**
  * 기간 선택 탭 컴포넌트
- * - 오늘/이번주/이번달 전환
+ * - 일/주/월/년 전환
  * - 모바일 최적화
  * - 터치 친화적 크기
  */
@@ -27,10 +26,11 @@ export function PeriodTabs({
       onValueChange={val => onValueChange(val as Period)}
       className={className}
     >
-      <TabsList className="w-full">
-        <TabsTrigger value="daily">오늘</TabsTrigger>
-        <TabsTrigger value="weekly">이번주</TabsTrigger>
-        <TabsTrigger value="monthly">이번달</TabsTrigger>
+      <TabsList className="w-full grid grid-cols-4">
+        <TabsTrigger value="daily">일</TabsTrigger>
+        <TabsTrigger value="weekly">주</TabsTrigger>
+        <TabsTrigger value="monthly">월</TabsTrigger>
+        <TabsTrigger value="yearly">년</TabsTrigger>
       </TabsList>
     </Tabs>
   )

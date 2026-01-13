@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import type { Period } from "@/lib/types/transaction"
 
 /**
  * 기간별 요약 데이터 타입
@@ -12,12 +13,12 @@ export interface PeriodSummary {
 
 /**
  * 기간별 요약 데이터 조회
- * @param period 조회 기간 ('daily' | 'weekly' | 'monthly')
+ * @param period 조회 기간 ('daily' | 'weekly' | 'monthly' | 'yearly')
  * @param date 기준 날짜
  * @returns 요약 데이터
  */
 export async function getSummaryByPeriod(
-  period: "daily" | "weekly" | "monthly",
+  period: Period,
   date: Date
 ): Promise<PeriodSummary> {
   const supabase = await createClient()
@@ -137,7 +138,7 @@ export async function getSummaryByPeriod(
  * 반복 거래의 발생 횟수 계산
  */
 function calculateOccurrences(
-  period: "daily" | "weekly" | "monthly",
+  period: Period,
   startDate: Date,
   endDate: Date,
   recurringStartDate: Date,
@@ -164,7 +165,7 @@ function calculateOccurrences(
     if (frequency === "weekly") {
       // 매주 반복: 해당 주에 해당 요일이 포함되는지 확인
       const targetDayOfWeek = recurringStartDate.getDay()
-      let currentDate = new Date(startDate)
+      const currentDate = new Date(startDate)
       while (currentDate <= endDate) {
         if (currentDate.getDay() === targetDayOfWeek) {
           return 1
@@ -175,7 +176,7 @@ function calculateOccurrences(
     } else {
       // 매월 반복: 해당 주에 해당 일(day)이 포함되는지 확인
       const targetDay = recurringStartDate.getDate()
-      let currentDate = new Date(startDate)
+      const currentDate = new Date(startDate)
       while (currentDate <= endDate) {
         if (currentDate.getDate() === targetDay) {
           return 1
@@ -190,7 +191,7 @@ function calculateOccurrences(
       // 매주 반복: 해당 월에 몇 번 발생하는지 계산
       const targetDayOfWeek = recurringStartDate.getDay()
       let count = 0
-      let currentDate = new Date(startDate)
+      const currentDate = new Date(startDate)
       while (currentDate <= endDate) {
         if (currentDate.getDay() === targetDayOfWeek) {
           count++
@@ -223,7 +224,7 @@ function calculateOccurrences(
  * 기간별 시작일/종료일 계산 헬퍼 함수
  */
 function calculatePeriodDates(
-  period: "daily" | "weekly" | "monthly",
+  period: Period,
   date: Date
 ): { startDate: string; endDate: string } {
   const year = date.getFullYear()
@@ -257,6 +258,16 @@ function calculatePeriodDates(
       // 이번 달 (1일 ~ 말일)
       const startDate = new Date(year, month, 1)
       const endDate = new Date(year, month + 1, 0) // 다음 달 0일 = 이번 달 마지막 날
+      return {
+        startDate: formatDateToYYYYMMDD(startDate),
+        endDate: formatDateToYYYYMMDD(endDate),
+      }
+    }
+
+    case "yearly": {
+      // 올해 (1월 1일 ~ 12월 31일)
+      const startDate = new Date(year, 0, 1) // January 1
+      const endDate = new Date(year, 11, 31) // December 31
       return {
         startDate: formatDateToYYYYMMDD(startDate),
         endDate: formatDateToYYYYMMDD(endDate),
