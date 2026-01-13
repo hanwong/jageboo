@@ -86,9 +86,11 @@ export async function getSummaryByPeriod(
         : null
 
       // 반복 거래가 해당 기간에 발생하는지 확인
-      // 1. 시작일이 기간 종료일 이전이어야 함
-      // 2. 종료일이 없거나 기간 시작일 이후여야 함
+      // 1. 시작일이 기간 시작일 이전이거나 같아야 함 (아직 시작하지 않은 반복 거래 제외)
+      // 2. 시작일이 기간 종료일 이전이어야 함
+      // 3. 종료일이 없거나 기간 시작일 이후여야 함
       const isInPeriod =
+        recurringStartDate <= startDateObj &&
         recurringStartDate <= endDateObj &&
         (!recurringEndDate || recurringEndDate >= startDateObj)
 
