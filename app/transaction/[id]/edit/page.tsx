@@ -6,10 +6,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { TransactionForm } from "@/components/transaction/transaction-form"
-import {
-  getTransactionById,
-  dummyTransactions,
-} from "@/lib/constants/dummy-data"
+import { getTransactionById } from "@/lib/queries/transactions"
 import type { TransactionFormData } from "@/lib/schemas/transaction"
 
 interface EditTransactionPageProps {
@@ -20,18 +17,13 @@ interface EditTransactionPageProps {
 
 /**
  * 거래 수정 화면
- * Task 006 - 거래 수정 UI 구현 (더미 데이터)
- * Phase 3에서 실제 데이터 연동 예정
+ * Task 006 - 거래 수정 UI 구현
+ * Phase 3 - 실제 데이터베이스 연동 완료
  */
 
-export function generateStaticParams() {
-  // 더미 데이터 기반 ID 목록 반환
-  return dummyTransactions.map(t => ({ id: t.id }))
-}
-
 async function EditTransactionContent({ id }: { id: string }) {
-  // 더미 데이터에서 거래 조회
-  const transaction = getTransactionById(id)
+  // 데이터베이스에서 거래 조회
+  const transaction = await getTransactionById(id)
 
   // 거래가 없으면 404
   if (!transaction) {

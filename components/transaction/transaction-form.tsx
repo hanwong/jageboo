@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useActionState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -16,6 +17,11 @@ import {
   type TransactionFormData,
 } from "@/lib/schemas/transaction"
 import type { TransactionType } from "@/lib/types"
+import {
+  createTransactionAction,
+  updateTransactionAction,
+  deleteTransactionAction,
+} from "@/app/actions/transactions"
 
 interface TransactionFormProps {
   mode?: "create" | "edit"
@@ -30,7 +36,7 @@ interface TransactionFormProps {
  * - 매출/매입 공통 사용
  * - Create/Edit 모드 지원
  * - 금액 자동 포커스
- * - Phase 2: 더미 데이터만 처리 (Phase 3에서 실제 Server Action 연동)
+ * - Server Actions 연동 (Phase 3)
  */
 export function TransactionForm({
   mode = "create",
@@ -42,12 +48,21 @@ export function TransactionForm({
   const amountInputRef = useRef<HTMLInputElement>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
+  // Server Action 상태 관리
+  const [actionState, formAction, isPending] = useActionState(
+    mode === "create"
+      ? createTransactionAction
+      : updateTransactionAction.bind(null, transactionId || ""),
+    { success: false }
+  )
+
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    setError,
+    formState: { errors },
   } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: initialData || {
@@ -65,22 +80,29 @@ export function TransactionForm({
     amountInputRef.current?.focus()
   }, [])
 
-  // 폼 제출 핸들러 (Phase 2: 더미 처리)
-  const onSubmit = async (data: TransactionFormData) => {
-    try {
-      if (mode === "edit") {
-        // Phase 3에서 Server Action으로 실제 수정
-        console.log("거래 수정:", { id: transactionId, ...data })
-      } else {
-        // Phase 3에서 Server Action으로 실제 저장
-        console.log("거래 생성:", data)
-      }
-
-      // 임시: 홈으로 리디렉션
-      router.push("/")
-    } catch (error) {
-      console.error("거래 저장 실패:", error)
+  // 서버 에러를 폼 필드에 반영
+  useEffect(() => {
+    if (actionState.errors) {
+      Object.entries(actionState.errors).forEach(([field, messages]) => {
+        if (messages && messages.length > 0) {
+          setError(field as keyof TransactionFormData, {
+            message: messages[0],
+          })
+        }
+      })
     }
+  }, [actionState.errors, setError])
+
+  // 폼 제출 핸들러
+  const onSubmit = async (data: TransactionFormData) => {
+    const formData = new FormData()
+    formData.append("type", data.type)
+    formData.append("amount", String(data.amount))
+    formData.append("date", data.date.toISOString())
+    if (data.memo) {
+      formData.append("memo", data.memo)
+    }
+    formAction(formData)
   }
 
   // 취소 핸들러
@@ -88,14 +110,17 @@ export function TransactionForm({
     router.push("/")
   }
 
-  // 삭제 핸들러 (Phase 2: 더미 처리)
-  const handleDelete = () => {
-    try {
-      // Phase 3에서 Server Action으로 실제 삭제
-      console.log("거래 삭제:", transactionId)
+  // 삭제 핸들러
+  const handleDelete = async () => {
+    if (!transactionId) return
 
-      // 임시: 홈으로 리디렉션
-      router.push("/")
+    try {
+      const result = await deleteTransactionAction(transactionId)
+      if (!result.success && result.error) {
+        console.error("거래 삭제 실패:", result.error)
+        alert(result.error)
+      }
+      // 성공 시 redirect가 Server Action에서 처리됨
     } catch (error) {
       console.error("거래 삭제 실패:", error)
     }
@@ -154,6 +179,13 @@ export function TransactionForm({
         </p>
       </div>
 
+      {/* 서버 에러 메시지 */}
+      {actionState.error && (
+        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+          {actionState.error}
+        </div>
+      )}
+
       {/* 버튼 그룹 */}
       <div className="space-y-3">
         {/* 저장/취소 버튼 */}
@@ -163,12 +195,12 @@ export function TransactionForm({
             variant="outline"
             className="flex-1"
             onClick={handleCancel}
-            disabled={isSubmitting}
+            disabled={isPending}
           >
             취소
           </Button>
-          <Button type="submit" className="flex-1" disabled={isSubmitting}>
-            {isSubmitting ? "저장 중..." : "저장"}
+          <Button type="submit" className="flex-1" disabled={isPending}>
+            {isPending ? "저장 중..." : "저장"}
           </Button>
         </div>
 
@@ -179,7 +211,7 @@ export function TransactionForm({
             variant="destructive"
             className="w-full"
             onClick={() => setShowDeleteDialog(true)}
-            disabled={isSubmitting}
+            disabled={isPending}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             삭제
