@@ -3,12 +3,14 @@ import { connection } from "next/server"
 import { AppLayout } from "@/components/layout/app-layout"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { DashboardClient } from "@/components/dashboard/dashboard-client"
+import { LandingPage } from "@/components/landing/landing-page"
 import { ProfitDisplaySkeleton } from "@/components/dashboard/profit-display-skeleton"
 import { SummaryCardSkeleton } from "@/components/dashboard/summary-card-skeleton"
 import { TransactionListSkeleton } from "@/components/transaction/transaction-card-skeleton"
 import { getTransactionsByPeriod } from "@/lib/queries/transactions"
 import { getSummaryByPeriod } from "@/lib/queries/summaries"
 import { getAllRecurringTransactions } from "@/lib/queries/recurring-transactions"
+import { createClient } from "@/lib/supabase/server"
 
 /**
  * 홈 화면 (대시보드)
@@ -34,7 +36,19 @@ async function DashboardContent() {
   )
 }
 
-export default function Home() {
+export default async function Home() {
+  // 사용자 인증 상태 확인
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // 로그인되지 않은 경우 랜딩 페이지 표시
+  if (!user) {
+    return <LandingPage />
+  }
+
+  // 로그인된 사용자는 대시보드 표시
   return (
     <AppLayout>
       <div className="min-h-screen px-4 pb-24 pt-6">
