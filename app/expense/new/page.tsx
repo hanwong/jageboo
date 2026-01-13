@@ -13,7 +13,7 @@ import { ArrowLeft } from "lucide-react"
 export default function NewExpensePage() {
   return (
     <AppLayout>
-      <div className="flex min-h-screen flex-col p-6">
+      <div className="flex min-h-screen flex-col px-6 pb-20 pt-6">
         {/* 헤더 */}
         <div className="mb-6 flex items-center gap-4">
           <Link href="/">

@@ -17,7 +17,7 @@ export function AppLayout({ children, className }: AppLayoutProps) {
       {/* 중앙 고정 컨테이너 */}
       <div className="mx-auto max-w-md">
         {/* 메인 컨텐츠 영역 - 하단 네비게이션 높이만큼 padding */}
-        <main className={cn("min-h-screen pb-20", className)}>{children}</main>
+        <main className={cn("min-h-screen", className)}>{children}</main>
       </div>
     </div>
   )

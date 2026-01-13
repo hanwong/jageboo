@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 export default function Home() {
   return (
     <AppLayout>
-      <div className="flex min-h-screen flex-col items-center justify-center p-6">
+      <div className="flex min-h-screen flex-col items-center justify-center px-6 pb-20 pt-6">
         <Card className="w-full max-w-sm">
           <CardHeader>
             <CardTitle className="text-center">대시보드</CardTitle>
