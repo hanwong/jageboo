@@ -7,8 +7,15 @@
       "env": {}
     },
     "context7": {
-      "type": "http",
-      "url": "https://mcp.context7.com/mcp"
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "ctx7sk-c02e4643-3b79-4e7d-acf2-1620eb45b58d"
+      ],
+      "env": {}
     },
     "sequential-thinking": {
       "command": "npx",
