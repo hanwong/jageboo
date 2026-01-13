@@ -9,6 +9,14 @@ import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { AmountInput } from "./amount-input"
 import { DatePicker } from "@/components/common/date-picker"
 import { ConfirmDialog } from "@/components/common/confirm-dialog"
@@ -22,6 +30,7 @@ import {
   updateTransactionAction,
   deleteTransactionAction,
 } from "@/app/actions/transactions"
+import { createRecurringTransactionAction } from "@/app/actions/recurring-transactions"
 
 interface TransactionFormProps {
   mode?: "create" | "edit"
@@ -35,6 +44,7 @@ interface TransactionFormProps {
  * - React Hook Form + Zod 검증
  * - 매출/매입 공통 사용
  * - Create/Edit 모드 지원
+ * - 반복 거래 옵션 지원
  * - 금액 자동 포커스
  * - Server Actions 연동 (Phase 3)
  */
@@ -48,6 +58,13 @@ export function TransactionForm({
   const amountInputRef = useRef<HTMLInputElement>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
+  // 반복 거래 상태
+  const [isRecurring, setIsRecurring] = useState(false)
+  const [frequency, setFrequency] = useState<"weekly" | "monthly">("monthly")
+  const [startDate, setStartDate] = useState<Date>(new Date())
+  const [hasEndDate, setHasEndDate] = useState(false)
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
+
   // Server Action 상태 관리
   const [actionState, formAction, isPending] = useActionState(
     mode === "create"
@@ -55,6 +72,10 @@ export function TransactionForm({
       : updateTransactionAction.bind(null, transactionId || ""),
     { success: false }
   )
+
+  // 반복 거래 생성 Server Action
+  const [recurringActionState, recurringFormAction, isRecurringPending] =
+    useActionState(createRecurringTransactionAction, { success: false })
 
   const {
     register,
@@ -80,7 +101,7 @@ export function TransactionForm({
     amountInputRef.current?.focus()
   }, [])
 
-  // 서버 에러를 폼 필드에 반영
+  // 서버 에러를 폼 필드에 반영 (일반 거래)
   useEffect(() => {
     if (actionState.errors) {
       Object.entries(actionState.errors).forEach(([field, messages]) => {
@@ -93,16 +114,42 @@ export function TransactionForm({
     }
   }, [actionState.errors, setError])
 
+  // 서버 에러를 폼 필드에 반영 (반복 거래)
+  useEffect(() => {
+    if (recurringActionState.errors) {
+      Object.entries(recurringActionState.errors).forEach(
+        ([field, messages]) => {
+          if (messages && messages.length > 0) {
+            setError(field as keyof TransactionFormData, {
+              message: messages[0],
+            })
+          }
+        }
+      )
+    }
+  }, [recurringActionState.errors, setError])
+
   // 폼 제출 핸들러
   const onSubmit = async (data: TransactionFormData) => {
     const formData = new FormData()
     formData.append("type", data.type)
     formData.append("amount", String(data.amount))
-    formData.append("date", data.date.toISOString())
-    if (data.memo) {
-      formData.append("memo", data.memo)
+    formData.append("memo", data.memo || "")
+
+    // 반복 거래인 경우
+    if (isRecurring && mode === "create") {
+      formData.append("frequency", frequency)
+      formData.append("start_date", startDate.toISOString())
+      if (hasEndDate && endDate) {
+        formData.append("end_date", endDate.toISOString())
+      }
+      formData.append("is_active", "true")
+      recurringFormAction(formData)
+    } else {
+      // 일반 거래인 경우
+      formData.append("date", data.date.toISOString())
+      formAction(formData)
     }
-    formAction(formData)
   }
 
   // 취소 핸들러
@@ -150,15 +197,100 @@ export function TransactionForm({
         />
       </div>
 
-      {/* 날짜 선택 */}
-      <div>
-        <DatePicker
-          date={dateValue}
-          onDateChange={date => setValue("date", date as Date)}
-          label="날짜"
-          error={errors.date?.message}
-        />
-      </div>
+      {/* 날짜 선택 (일반 거래인 경우에만) */}
+      {!isRecurring && (
+        <div>
+          <DatePicker
+            date={dateValue}
+            onDateChange={date => setValue("date", date as Date)}
+            label="날짜"
+            error={errors.date?.message}
+          />
+        </div>
+      )}
+
+      {/* 반복 거래 옵션 (create 모드에만 표시) */}
+      {mode === "create" && (
+        <div className="space-y-4 rounded-lg border p-4">
+          {/* 반복 거래 활성화 체크박스 */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="recurring-enabled"
+              checked={isRecurring}
+              onCheckedChange={checked => setIsRecurring(checked === true)}
+            />
+            <Label
+              htmlFor="recurring-enabled"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              반복 거래로 등록
+            </Label>
+          </div>
+
+          {/* 반복 거래 활성화 시 추가 필드 */}
+          {isRecurring && (
+            <>
+              {/* 반복 주기 */}
+              <div className="space-y-2">
+                <Label htmlFor="frequency">반복 주기</Label>
+                <Select
+                  value={frequency}
+                  onValueChange={value =>
+                    setFrequency(value as "weekly" | "monthly")
+                  }
+                >
+                  <SelectTrigger id="frequency">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekly">매주</SelectItem>
+                    <SelectItem value="monthly">매월</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 시작일 */}
+              <div className="space-y-2">
+                <DatePicker
+                  date={startDate}
+                  onDateChange={date => setStartDate(date as Date)}
+                  label="시작일"
+                />
+              </div>
+
+              {/* 종료일 (선택사항) */}
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="has-end-date"
+                    checked={hasEndDate}
+                    onCheckedChange={checked => {
+                      setHasEndDate(checked === true)
+                      if (!checked) {
+                        setEndDate(undefined)
+                      }
+                    }}
+                  />
+                  <Label
+                    htmlFor="has-end-date"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    종료일 설정
+                  </Label>
+                </div>
+
+                {hasEndDate && (
+                  <DatePicker
+                    date={endDate || new Date()}
+                    onDateChange={date => setEndDate(date as Date)}
+                    label="종료일"
+                  />
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* 메모 입력 (선택사항) */}
       <div className="space-y-2">
@@ -180,9 +312,9 @@ export function TransactionForm({
       </div>
 
       {/* 서버 에러 메시지 */}
-      {actionState.error && (
+      {(actionState.error || recurringActionState.error) && (
         <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-          {actionState.error}
+          {actionState.error || recurringActionState.error}
         </div>
       )}
 
@@ -195,12 +327,16 @@ export function TransactionForm({
             variant="outline"
             className="flex-1"
             onClick={handleCancel}
-            disabled={isPending}
+            disabled={isPending || isRecurringPending}
           >
             취소
           </Button>
-          <Button type="submit" className="flex-1" disabled={isPending}>
-            {isPending ? "저장 중..." : "저장"}
+          <Button
+            type="submit"
+            className="flex-1"
+            disabled={isPending || isRecurringPending}
+          >
+            {isPending || isRecurringPending ? "저장 중..." : "저장"}
           </Button>
         </div>
 
