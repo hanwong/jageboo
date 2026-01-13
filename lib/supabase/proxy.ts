@@ -47,6 +47,22 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
+  // 보호된 라우트 접근 제어
+  if (!user && request.nextUrl.pathname.startsWith("/protected")) {
+    // 인증되지 않은 사용자는 로그인 페이지로 리디렉션
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/login";
+    return NextResponse.redirect(url);
+  }
+
+  // 이미 로그인한 사용자가 로그인 페이지 접근 시 홈으로 리디렉션
+  if (user && request.nextUrl.pathname.startsWith("/auth/login")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
+  // 기타 인증되지 않은 라우트 처리
   if (
     request.nextUrl.pathname !== "/" &&
     !user &&
