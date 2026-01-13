@@ -1,8 +1,7 @@
 "use client"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-export type Period = "daily" | "weekly" | "monthly"
+import type { Period } from "@/lib/constants/dummy-data"
 
 interface PeriodTabsProps {
   value: Period
@@ -27,16 +26,10 @@ export function PeriodTabs({
       onValueChange={val => onValueChange(val as Period)}
       className={className}
     >
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="daily" className="text-base">
-          오늘
-        </TabsTrigger>
-        <TabsTrigger value="weekly" className="text-base">
-          이번주
-        </TabsTrigger>
-        <TabsTrigger value="monthly" className="text-base">
-          이번달
-        </TabsTrigger>
+      <TabsList className="w-full">
+        <TabsTrigger value="today">오늘</TabsTrigger>
+        <TabsTrigger value="week">이번주</TabsTrigger>
+        <TabsTrigger value="month">이번달</TabsTrigger>
       </TabsList>
     </Tabs>
   )

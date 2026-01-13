@@ -52,6 +52,24 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        income: {
+          DEFAULT: "hsl(var(--income))",
+          foreground: "hsl(var(--income-foreground))",
+          muted: "hsl(var(--income-muted))",
+          "muted-foreground": "hsl(var(--income-muted-foreground))",
+        },
+        expense: {
+          DEFAULT: "hsl(var(--expense))",
+          foreground: "hsl(var(--expense-foreground))",
+          muted: "hsl(var(--expense-muted))",
+          "muted-foreground": "hsl(var(--expense-muted-foreground))",
+        },
+        "profit-positive": {
+          DEFAULT: "hsl(var(--profit-positive))",
+          foreground: "hsl(var(--profit-positive-foreground))",
+          muted: "hsl(var(--profit-positive-muted))",
+          "muted-foreground": "hsl(var(--profit-positive-muted-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { format } from "date-fns"
 import { ko } from "date-fns/locale"
 import { Calendar as CalendarIcon } from "lucide-react"
@@ -35,10 +36,12 @@ export function DatePicker({
   error,
   disabled,
 }: DatePickerProps) {
+  const [open, setOpen] = useState(false)
+
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -51,18 +54,20 @@ export function DatePicker({
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? (
-              format(date, "PPP", { locale: ko })
+              format(date, "yyyy년 M월 d일 (EEE)", { locale: ko })
             ) : (
               <span>날짜를 선택하세요</span>
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
+        <PopoverContent className="w-auto p-0" align="center">
           <Calendar
             mode="single"
             selected={date}
-            onSelect={onDateChange}
-            initialFocus
+            onSelect={newDate => {
+              onDateChange(newDate)
+              setOpen(false)
+            }}
             locale={ko}
           />
         </PopoverContent>

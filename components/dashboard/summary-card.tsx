@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { formatCurrency } from "@/lib/constants/dummy-data"
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react"
 
 interface SummaryCardProps {
@@ -24,27 +25,18 @@ export function SummaryCard({
   const config = {
     income: {
       icon: TrendingUp,
-      color: "text-green-600",
-      bgColor: "bg-green-100 dark:bg-green-900",
-      textColor: "text-green-600 dark:text-green-400",
+      bgColor: "bg-income-muted",
+      textColor: "text-income",
     },
     expense: {
       icon: TrendingDown,
-      color: "text-red-600",
-      bgColor: "bg-red-100 dark:bg-red-900",
-      textColor: "text-red-600 dark:text-red-400",
+      bgColor: "bg-expense-muted",
+      textColor: "text-expense",
     },
     profit: {
       icon: DollarSign,
-      color: amount >= 0 ? "text-blue-600" : "text-red-600",
-      bgColor:
-        amount >= 0
-          ? "bg-blue-100 dark:bg-blue-900"
-          : "bg-red-100 dark:bg-red-900",
-      textColor:
-        amount >= 0
-          ? "text-blue-600 dark:text-blue-400"
-          : "text-red-600 dark:text-red-400",
+      bgColor: amount >= 0 ? "bg-profit-positive-muted" : "bg-expense-muted",
+      textColor: amount >= 0 ? "text-profit-positive" : "text-expense",
     },
   }
 
@@ -59,9 +51,14 @@ export function SummaryCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className={cn("text-2xl font-bold tabular-nums", textColor)}>
+        <div
+          className={cn(
+            "text-right text-2xl font-bold tabular-nums",
+            textColor
+          )}
+        >
           {type === "profit" && amount > 0 && "+"}
-          {amount.toLocaleString("ko-KR")}원
+          {formatCurrency(amount)}원
         </div>
       </CardContent>
     </Card>

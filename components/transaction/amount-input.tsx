@@ -47,13 +47,13 @@ export const AmountInput = forwardRef<HTMLInputElement, AmountInputProps>(
             placeholder="0"
             onInput={handleInput}
             className={cn(
-              "text-right text-2xl font-semibold tabular-nums",
+              "pr-9 text-right font-semibold tabular-nums",
               error && "border-destructive",
               className
             )}
             {...props}
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-2xl font-semibold text-muted-foreground">
+          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-semibold text-muted-foreground">
             원
           </span>
         </div>

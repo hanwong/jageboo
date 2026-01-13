@@ -16,6 +16,12 @@ interface EditTransactionPageProps {
  * Task 001 - 빈 껍데기 구현
  * Phase 2에서 실제 수정 폼 구현 예정
  */
+
+export function generateStaticParams() {
+  // Phase 2에서 더미 데이터 기반으로 실제 ID 반환 예정
+  return [{ id: "1" }]
+}
+
 export default async function EditTransactionPage({
   params,
 }: EditTransactionPageProps) {

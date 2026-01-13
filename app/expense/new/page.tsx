@@ -2,13 +2,15 @@ import { AppLayout } from "@/components/layout/app-layout"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { TransactionForm } from "@/components/transaction/transaction-form"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+import { Suspense } from "react"
 
 /**
  * 매입 입력 화면
- * Task 001 - 빈 껍데기 구현
- * Phase 2에서 실제 입력 폼 구현 예정
+ * Task 005 - 매입 입력 폼 구현 (더미 데이터)
+ * Phase 3에서 실제 데이터베이스 연동 예정
  */
 export default function NewExpensePage() {
   return (
@@ -29,13 +31,10 @@ export default function NewExpensePage() {
           <CardHeader>
             <CardTitle>빠른 매입 기록</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center text-sm text-muted-foreground">
-              <p>금액 입력 필드</p>
-              <p>날짜 선택기</p>
-              <p>메모 입력 필드</p>
-              <p className="mt-2">(Phase 2에서 구현 예정)</p>
-            </div>
+          <CardContent>
+            <Suspense fallback={<div>Loading...</div>}>
+              <TransactionForm type="expense" />
+            </Suspense>
           </CardContent>
         </Card>
       </div>

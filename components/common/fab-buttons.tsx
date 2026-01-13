@@ -27,7 +27,7 @@ export function FABButtons({ className }: FABButtonsProps) {
       <Link href="/income/new">
         <Button
           size="lg"
-          className="h-14 w-14 rounded-full bg-green-600 shadow-lg hover:bg-green-700 hover:shadow-xl"
+          className="h-14 w-14 rounded-full bg-income text-income-foreground shadow-lg hover:bg-income/90 hover:shadow-xl"
           aria-label="매출 추가"
         >
           <Plus className="h-6 w-6" />
@@ -39,7 +39,7 @@ export function FABButtons({ className }: FABButtonsProps) {
       <Link href="/expense/new">
         <Button
           size="lg"
-          className="h-14 w-14 rounded-full bg-red-600 shadow-lg hover:bg-red-700 hover:shadow-xl"
+          className="h-14 w-14 rounded-full bg-expense text-expense-foreground shadow-lg hover:bg-expense/90 hover:shadow-xl"
           aria-label="매입 추가"
         >
           <Plus className="h-6 w-6" />

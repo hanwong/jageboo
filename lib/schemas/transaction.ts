@@ -19,22 +19,18 @@ export const transactionFormSchema = z.object({
   type: transactionTypeSchema,
   amount: z
     .number({
-      error: issue =>
-        issue.input === undefined
-          ? "금액을 입력해주세요"
-          : "유효한 금액을 입력해주세요",
+      required_error: "금액을 입력해주세요",
+      invalid_type_error: "유효한 금액을 입력해주세요",
     })
-    .positive({ error: "금액은 0보다 커야 합니다" })
-    .max(99999999.99, { error: "금액이 너무 큽니다 (최대 9,999만원)" }),
+    .positive({ message: "금액은 0보다 커야 합니다" })
+    .max(99999999.99, { message: "금액이 너무 큽니다 (최대 9,999만원)" }),
   date: z.date({
-    error: issue =>
-      issue.input === undefined
-        ? "날짜를 선택해주세요"
-        : "유효한 날짜를 선택해주세요",
+    required_error: "날짜를 선택해주세요",
+    invalid_type_error: "유효한 날짜를 선택해주세요",
   }),
   memo: z
     .string()
-    .max(50, { error: "메모는 최대 50자까지 입력 가능합니다" })
+    .max(50, { message: "메모는 최대 50자까지 입력 가능합니다" })
     .optional()
     .nullable(),
 })
@@ -46,19 +42,19 @@ export const transactionFormSchema = z.object({
 export const transactionUpdateSchema = z.object({
   amount: z
     .number({
-      error: "유효한 금액을 입력해주세요",
+      invalid_type_error: "유효한 금액을 입력해주세요",
     })
-    .positive({ error: "금액은 0보다 커야 합니다" })
-    .max(99999999.99, { error: "금액이 너무 큽니다 (최대 9,999만원)" })
+    .positive({ message: "금액은 0보다 커야 합니다" })
+    .max(99999999.99, { message: "금액이 너무 큽니다 (최대 9,999만원)" })
     .optional(),
   date: z
     .date({
-      error: "유효한 날짜를 선택해주세요",
+      invalid_type_error: "유효한 날짜를 선택해주세요",
     })
     .optional(),
   memo: z
     .string()
-    .max(50, { error: "메모는 최대 50자까지 입력 가능합니다" })
+    .max(50, { message: "메모는 최대 50자까지 입력 가능합니다" })
     .optional()
     .nullable(),
 })

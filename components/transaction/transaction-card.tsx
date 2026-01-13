@@ -1,10 +1,9 @@
 import Link from "next/link"
-import { format } from "date-fns"
-import { ko } from "date-fns/locale"
 import { TrendingUp, TrendingDown } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { formatCurrency, formatDate } from "@/lib/constants/dummy-data"
 import type { Transaction } from "@/lib/types"
 
 interface TransactionCardProps {
@@ -30,28 +29,19 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
               className={cn(
                 "flex h-10 w-10 items-center justify-center rounded-full",
                 isIncome
-                  ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400"
-                  : "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400"
+                  ? "bg-income-muted text-income"
+                  : "bg-expense-muted text-expense"
               )}
             >
               <Icon className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <Badge
-                  variant={isIncome ? "default" : "secondary"}
-                  className={cn(
-                    isIncome
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-red-600 hover:bg-red-700"
-                  )}
-                >
+                <Badge variant={isIncome ? "income" : "expense"}>
                   {isIncome ? "매출" : "매입"}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
-                  {format(new Date(transaction.date), "M월 d일 (EEE)", {
-                    locale: ko,
-                  })}
+                  {formatDate(transaction.date)}
                 </span>
               </div>
               {transaction.memo && (
@@ -64,11 +54,11 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
           <div
             className={cn(
               "text-lg font-semibold tabular-nums",
-              isIncome ? "text-green-600" : "text-red-600"
+              isIncome ? "text-income" : "text-expense"
             )}
           >
             {isIncome ? "+" : "-"}
-            {transaction.amount.toLocaleString("ko-KR")}원
+            {formatCurrency(transaction.amount)}원
           </div>
         </CardContent>
       </Card>
