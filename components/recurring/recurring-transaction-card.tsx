@@ -24,7 +24,22 @@ export function RecurringTransactionCard({
   const isIncome = transaction.type === "income"
   const Icon = isIncome ? TrendingUp : TrendingDown
 
-  const frequencyText = transaction.frequency === "weekly" ? "매주" : "매월"
+  // 반복 주기 텍스트 생성 (요일/날짜 포함)
+  const frequencyText = () => {
+    const startDate = new Date(transaction.start_date)
+
+    if (transaction.frequency === "weekly") {
+      // 매주 + 요일
+      const dayOfWeek = ["일", "월", "화", "수", "목", "금", "토"][
+        startDate.getDay()
+      ]
+      return `매주 ${dayOfWeek}`
+    } else {
+      // 매월 + 날짜
+      const day = startDate.getDate()
+      return `매월 ${day}일`
+    }
+  }
 
   // 기간 포맷팅
   const formatDate = (date: Date) => {
@@ -75,7 +90,7 @@ export function RecurringTransactionCard({
               <Badge variant={isIncome ? "income" : "expense"}>
                 {isIncome ? "매출" : "매입"}
               </Badge>
-              <Badge variant="outline">{frequencyText}</Badge>
+              <Badge variant="outline">{frequencyText()}</Badge>
             </div>
             {transaction.memo && (
               <p className="mt-1 text-sm text-muted-foreground">
