@@ -1,9 +1,10 @@
 import type { RecurringTransaction } from "@/lib/types/database"
 import type { Period } from "@/lib/types/transaction"
+import { calculateActualOccurrenceDates } from "./recurring-occurrence"
 
 /**
  * 기간별로 반복 거래 필터링
- * 해당 기간에 실제로 발생하는 반복 거래만 표시
+ * 실제 발생일 기준으로 해당 기간에 1회 이상 발생하는 반복 거래만 표시
  *
  * @param transactions 반복 거래 목록
  * @param period 조회 기간 ('daily' | 'weekly' | 'monthly' | 'yearly')
@@ -18,29 +19,14 @@ export function filterRecurringByPeriod(
   const { startDate, endDate } = calculatePeriodDates(period, date)
 
   return transactions.filter(transaction => {
-    const recurringStartDate = transaction.start_date
-    const recurringEndDate = transaction.end_date
-
-    // 반복 거래가 해당 기간에 발생하는지 확인
-    // 1. 시작일이 기간 종료일 이전이어야 함
-    // 2. 종료일이 없거나 기간 시작일 이후여야 함
-    const isInPeriod =
-      recurringStartDate <= endDate &&
-      (!recurringEndDate || recurringEndDate >= startDate)
-
-    if (!isInPeriod) return false
-
-    // 해당 기간에 실제로 발생하는지 확인
-    const occurrences = calculateOccurrences(
-      period,
+    // 실제 발생일 계산
+    const occurrences = calculateActualOccurrenceDates(
+      transaction,
       startDate,
-      endDate,
-      recurringStartDate,
-      recurringEndDate,
-      transaction.frequency
+      endDate
     )
-
-    return occurrences > 0
+    // 발생일이 1개 이상 있으면 표시
+    return occurrences.length > 0
   })
 }
 
@@ -90,111 +76,39 @@ function calculatePeriodDates(
 
 /**
  * 반복 거래의 발생 횟수 계산
+ *
+ * @deprecated 레거시 시그니처 지원용, 새 코드는 calculateActualOccurrenceDates 직접 사용 권장
+ *
+ * @param period 조회 기간 ('daily' | 'weekly' | 'monthly' | 'yearly')
+ * @param periodStartDate 선택 기간 시작일
+ * @param periodEndDate 선택 기간 종료일
+ * @param today 오늘 날짜 (더 이상 사용하지 않음)
+ * @param recurringStartDate 반복 거래 시작일
+ * @param recurringEndDate 반복 거래 종료일 (null이면 무제한)
+ * @param frequency 반복 빈도 ('weekly' | 'monthly')
+ * @returns 발생 횟수
  */
-function calculateOccurrences(
+export function calculateOccurrences(
   period: Period,
-  startDate: Date,
-  endDate: Date,
+  periodStartDate: Date,
+  periodEndDate: Date,
+  today: Date,
   recurringStartDate: Date,
   recurringEndDate: Date | null,
   frequency: "weekly" | "monthly"
 ): number {
-  if (period === "daily") {
-    // 일별 조회: 해당 날짜에 발생하는지 확인
-    if (frequency === "weekly") {
-      // 매주 반복: 같은 요일인지 확인
-      const isSameDay = startDate.getDay() === recurringStartDate.getDay()
-      return isSameDay ? 1 : 0
-    } else {
-      // 매월 반복: 같은 일(day)인지 확인
-      const isSameDate = startDate.getDate() === recurringStartDate.getDate()
-      return isSameDate ? 1 : 0
-    }
-  } else if (period === "weekly") {
-    // 주별 조회: 해당 주에 발생하는지 확인
-    if (frequency === "weekly") {
-      // 매주 반복: 해당 주에 해당 요일이 포함되는지 확인
-      const targetDayOfWeek = recurringStartDate.getDay()
-      const currentDate = new Date(startDate)
-      while (currentDate <= endDate) {
-        if (currentDate.getDay() === targetDayOfWeek) {
-          return 1
-        }
-        currentDate.setDate(currentDate.getDate() + 1)
-      }
-      return 0
-    } else {
-      // 매월 반복: 해당 주에 해당 일(day)이 포함되는지 확인
-      const targetDay = recurringStartDate.getDate()
-      const currentDate = new Date(startDate)
-      while (currentDate <= endDate) {
-        if (currentDate.getDate() === targetDay) {
-          return 1
-        }
-        currentDate.setDate(currentDate.getDate() + 1)
-      }
-      return 0
-    }
-  } else if (period === "monthly") {
-    // 월별 조회: 해당 월에 발생하는지 확인
-    if (frequency === "weekly") {
-      // 매주 반복: 해당 월에 몇 번 발생하는지 계산
-      const targetDayOfWeek = recurringStartDate.getDay()
-      let count = 0
-      const currentDate = new Date(startDate)
-      while (currentDate <= endDate) {
-        if (currentDate.getDay() === targetDayOfWeek) {
-          count++
-        }
-        currentDate.setDate(currentDate.getDate() + 1)
-      }
-      return count
-    } else {
-      // 매월 반복: 해당 월에 해당 일(day)이 있는지 확인
-      const targetDay = recurringStartDate.getDate()
-      const monthStart = startDate.getMonth()
-      const monthEnd = endDate.getMonth()
-      const yearStart = startDate.getFullYear()
-      const yearEnd = endDate.getFullYear()
+  // 레거시 호출 지원: RecurringTransaction 객체 구성
+  const recurring = {
+    start_date: recurringStartDate,
+    end_date: recurringEndDate,
+    frequency: frequency,
+  } as RecurringTransaction
 
-      // 같은 월인지 확인
-      if (yearStart === yearEnd && monthStart === monthEnd) {
-        // 해당 월의 마지막 날짜 확인
-        const lastDay = new Date(yearStart, monthStart + 1, 0).getDate()
-        if (targetDay <= lastDay) {
-          return 1
-        }
-      }
-      return 0
-    }
-  } else {
-    // 연별 조회: 해당 년에 발생하는지 확인
-    if (frequency === "weekly") {
-      // 매주 반복: 해당 년에 몇 번 발생하는지 계산
-      const targetDayOfWeek = recurringStartDate.getDay()
-      let count = 0
-      const currentDate = new Date(startDate)
-      while (currentDate <= endDate) {
-        if (currentDate.getDay() === targetDayOfWeek) {
-          count++
-        }
-        currentDate.setDate(currentDate.getDate() + 1)
-      }
-      return count
-    } else {
-      // 매월 반복: 해당 년에 몇 번 발생하는지 계산 (12개월)
-      const targetDay = recurringStartDate.getDate()
-      let count = 0
-      const yearStart = startDate.getFullYear()
+  const occurrences = calculateActualOccurrenceDates(
+    recurring,
+    periodStartDate,
+    periodEndDate
+  )
 
-      // 1월부터 12월까지 순회
-      for (let month = 0; month < 12; month++) {
-        const lastDay = new Date(yearStart, month + 1, 0).getDate()
-        if (targetDay <= lastDay) {
-          count++
-        }
-      }
-      return count
-    }
-  }
+  return occurrences.length
 }

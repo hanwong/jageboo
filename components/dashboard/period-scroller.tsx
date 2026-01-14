@@ -43,7 +43,9 @@ export function PeriodScroller({
     if (periodType === "weekly") {
       // Generate weeks: 0 to -104 (current + 2 years past)
       for (let offset = 0; offset >= -104; offset--) {
-        const weekStart = startOfWeek(addWeeks(now, offset), { weekStartsOn: 1 })
+        const weekStart = startOfWeek(addWeeks(now, offset), {
+          weekStartsOn: 1,
+        })
         items.push({
           offset,
           label: formatWeekLabel(weekStart, offset),
@@ -91,7 +93,7 @@ export function PeriodScroller({
     <div className={cn("py-3", className)}>
       <div
         ref={scrollContainerRef}
-        className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"
+        className="scrollbar-hide flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2"
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -106,15 +108,15 @@ export function PeriodScroller({
               ref={isSelected ? selectedItemRef : null}
               onClick={() => onOffsetChange(period.offset)}
               className={cn(
-                "flex-shrink-0 px-4 py-2 rounded-lg",
-                "text-sm font-medium whitespace-nowrap",
+                "flex-shrink-0 rounded-lg px-4 py-2",
+                "whitespace-nowrap text-sm font-medium",
                 "transition-all duration-200",
                 "snap-center",
-                "min-h-[44px] flex items-center justify-center",
+                "flex min-h-[44px] items-center justify-center",
                 isSelected
-                  ? "bg-primary text-primary-foreground shadow-md scale-105"
+                  ? "scale-105 bg-primary text-primary-foreground shadow-md"
                   : period.isCurrent
-                    ? "bg-accent text-accent-foreground border-2 border-primary"
+                    ? "border-2 border-primary bg-accent text-accent-foreground"
                     : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >

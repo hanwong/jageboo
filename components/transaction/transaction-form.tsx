@@ -155,7 +155,7 @@ export function TransactionForm({
     }
   }, [recurringActionState.errors, setError])
 
-  // 일반 거래 성공 시 토스트 알림
+  // 일반 거래 성공 시 토스트 알림 및 리디렉션
   useEffect(() => {
     if (actionState.success) {
       const message =
@@ -165,21 +165,23 @@ export function TransactionForm({
             ? "반복 거래가 수정되었습니다"
             : "거래가 수정되었습니다"
       toast.success(message)
-      // redirect는 Server Action에서 처리됨
+      // 홈으로 리디렉션
+      router.push("/")
     } else if (actionState.error) {
       toast.error(actionState.error)
     }
-  }, [actionState.success, actionState.error, mode])
+  }, [actionState.success, actionState.error, mode, router])
 
-  // 반복 거래 성공 시 토스트 알림
+  // 반복 거래 성공 시 토스트 알림 및 리디렉션
   useEffect(() => {
     if (recurringActionState.success) {
       toast.success("반복 거래가 등록되었습니다")
-      // redirect는 Server Action에서 처리됨
+      // 홈으로 리디렉션
+      router.push("/")
     } else if (recurringActionState.error) {
       toast.error(recurringActionState.error)
     }
-  }, [recurringActionState.success, recurringActionState.error])
+  }, [recurringActionState.success, recurringActionState.error, router])
 
   // 폼 제출 핸들러
   const onSubmit = async (data: TransactionFormData) => {

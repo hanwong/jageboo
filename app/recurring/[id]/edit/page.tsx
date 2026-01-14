@@ -51,7 +51,7 @@ export default async function RecurringEditPage({
       <div className="min-h-screen px-6 pb-24 pt-6">
         {/* 헤더 */}
         <div className="mb-6 flex items-center gap-4">
-          <Link href="/settings">
+          <Link href="/">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>

@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { isToday } from "date-fns"
 import { ProfitDisplay } from "./profit-display"
 import { SummaryCard } from "./summary-card"
 import { PeriodTabs } from "./period-tabs"
 import { DateSelector } from "./date-selector"
 import { PeriodScroller } from "./period-scroller"
-import { PeriodResetButton } from "./period-reset-button"
 import { TransactionList } from "@/components/transaction/transaction-list"
 import { RecurringTransactionList } from "@/components/recurring/recurring-transaction-list"
 import { createClient } from "@/lib/supabase/client"
@@ -24,6 +22,34 @@ interface DashboardClientProps {
     net_profit: number
   }
   initialRecurringTransactions: RecurringTransaction[]
+}
+
+/**
+ * PeriodSelection을 기반으로 대표 날짜 계산
+ * offset이 있으면 해당 offset을 적용한 날짜 반환
+ */
+function getReferenceDateFromSelection(selection: PeriodSelection): Date {
+  if (selection.type === "daily") {
+    return selection.date
+  }
+
+  const now = new Date()
+
+  if (selection.type === "weekly") {
+    const targetDate = new Date(now)
+    targetDate.setDate(now.getDate() + selection.weekOffset * 7)
+    return targetDate
+  } else if (selection.type === "monthly") {
+    const targetDate = new Date(now)
+    targetDate.setMonth(now.getMonth() + selection.monthOffset)
+    return targetDate
+  } else if (selection.type === "yearly") {
+    const targetDate = new Date(now)
+    targetDate.setFullYear(now.getFullYear() + selection.yearOffset)
+    return targetDate
+  }
+
+  return now
 }
 
 /**
@@ -45,27 +71,9 @@ export function DashboardClient({
   const [summary, setSummary] = useState(initialSummary)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Check if viewing current period
-  const isViewingCurrent = useMemo(() => {
-    if (periodSelection.type === "daily") {
-      return isToday(periodSelection.date)
-    }
-    // For weekly/monthly/yearly, check if offset is 0
-    const offset =
-      "weekOffset" in periodSelection
-        ? periodSelection.weekOffset
-        : "monthOffset" in periodSelection
-          ? periodSelection.monthOffset
-          : "yearOffset" in periodSelection
-            ? periodSelection.yearOffset
-            : 0
-    return offset === 0
-  }, [periodSelection])
-
   // 기간별 반복 거래 필터링
   const filteredRecurringTransactions = useMemo(() => {
-    const referenceDate =
-      periodSelection.type === "daily" ? periodSelection.date : new Date()
+    const referenceDate = getReferenceDateFromSelection(periodSelection)
     return filterRecurringByPeriod(
       initialRecurringTransactions,
       periodSelection.type,
@@ -105,19 +113,6 @@ export function DashboardClient({
     }
   }
 
-  // Reset to current period
-  const handleResetToCurrent = () => {
-    if (periodSelection.type === "daily") {
-      setPeriodSelection({ type: "daily", date: new Date() })
-    } else if (periodSelection.type === "weekly") {
-      setPeriodSelection({ type: "weekly", weekOffset: 0 })
-    } else if (periodSelection.type === "monthly") {
-      setPeriodSelection({ type: "monthly", monthOffset: 0 })
-    } else if (periodSelection.type === "yearly") {
-      setPeriodSelection({ type: "yearly", yearOffset: 0 })
-    }
-  }
-
   // Get current offset for scroller
   const getCurrentOffset = (): number => {
     if (periodSelection.type === "weekly" && "weekOffset" in periodSelection) {
@@ -144,9 +139,8 @@ export function DashboardClient({
         const supabase = createClient()
 
         // 기간별 시작일/종료일 계산
-        const { startDate, endDate } = calculatePeriodDatesForSelection(
-          periodSelection
-        )
+        const { startDate, endDate } =
+          calculatePeriodDatesForSelection(periodSelection)
 
         // 거래 내역 조회
         const { data: transactionsData, error: transactionsError } =
@@ -172,10 +166,7 @@ export function DashboardClient({
         }))
 
         // 반복 거래를 포함한 요약 데이터 조회 (API)
-        const referenceDate =
-          periodSelection.type === "daily"
-            ? periodSelection.date
-            : new Date()
+        const referenceDate = getReferenceDateFromSelection(periodSelection)
         const summaryResponse = await fetch(
           `/api/summary?period=${periodSelection.type}&date=${referenceDate.toISOString()}`
         )
@@ -215,10 +206,6 @@ export function DashboardClient({
             value={periodSelection.type}
             onValueChange={handlePeriodTypeChange}
           />
-
-          {!isViewingCurrent && (
-            <PeriodResetButton onClick={handleResetToCurrent} />
-          )}
         </div>
 
         {/* Date Selector for Daily Period */}
@@ -270,9 +257,10 @@ export function DashboardClient({
 /**
  * 기간 선택에 따른 시작일/종료일 계산 헬퍼 함수
  */
-function calculatePeriodDatesForSelection(
-  selection: PeriodSelection
-): { startDate: string; endDate: string } {
+function calculatePeriodDatesForSelection(selection: PeriodSelection): {
+  startDate: string
+  endDate: string
+} {
   if (selection.type === "daily") {
     // Use the selected date
     return {

@@ -30,6 +30,7 @@ export function SettingsClient({ user }: SettingsClientProps) {
       await signOut()
       toast.success("로그아웃되었습니다")
     } catch (error) {
+      console.error("Logout error:", error)
       toast.error("로그아웃에 실패했습니다")
       setIsLoggingOut(false)
     }

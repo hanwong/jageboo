@@ -14,7 +14,7 @@ interface RecurringTransactionCardProps {
 
 /**
  * 반복 거래 카드 컴포넌트
- * - 금액, 메모, 주기 표시
+ * - 금액, 메모, 주기, 기간 표시
  * - 클릭 시 수정 페이지로 이동
  */
 export function RecurringTransactionCard({
@@ -25,6 +25,27 @@ export function RecurringTransactionCard({
   const Icon = isIncome ? TrendingUp : TrendingDown
 
   const frequencyText = transaction.frequency === "weekly" ? "매주" : "매월"
+
+  // 기간 포맷팅
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
+  }
+
+  const periodText = () => {
+    const startDate = new Date(transaction.start_date)
+    const startDateStr = formatDate(startDate)
+
+    if (transaction.end_date) {
+      const endDate = new Date(transaction.end_date)
+      const endDateStr = formatDate(endDate)
+      return `${startDateStr} ~ ${endDateStr}`
+    }
+
+    return `${startDateStr}부터`
+  }
 
   const handleCardClick = () => {
     if (onClick) {
@@ -61,6 +82,7 @@ export function RecurringTransactionCard({
                 {transaction.memo}
               </p>
             )}
+            <p className="mt-1 text-xs text-muted-foreground">{periodText()}</p>
           </div>
         </div>
         <div

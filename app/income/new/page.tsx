@@ -25,8 +25,8 @@ export default function NewIncomePage() {
             </Button>
           </Link>
           <h1 className="text-2xl font-bold">매출 입력</h1>
-          <div className={cn("bg-income-muted rounded-full p-2")}>
-            <TrendingUp className={cn("text-income h-4 w-4")} />
+          <div className={cn("rounded-full bg-income-muted p-2")}>
+            <TrendingUp className={cn("h-4 w-4 text-income")} />
           </div>
         </div>
 

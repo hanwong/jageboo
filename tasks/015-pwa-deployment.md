@@ -344,6 +344,7 @@ Chrome DevTools → Lighthouse:
 ## 완료 내역
 
 ### PWA Manifest
+
 - ✅ `app/manifest.ts` 생성
 - ✅ 앱 이름: "자영업자 장부 - 매입매출 관리"
 - ✅ display: "standalone" (앱처럼 실행)
@@ -353,12 +354,14 @@ Chrome DevTools → Lighthouse:
 - ✅ categories: ["business", "finance", "productivity"]
 
 ### 앱 아이콘
+
 - ✅ `app/icon.tsx` 생성 (512x512, Next.js ImageResponse)
 - ✅ `app/apple-icon.tsx` 생성 (180x180, iOS용)
 - ✅ 자동 생성: `/icon`, `/apple-icon` 라우트
 - ✅ manifest에서 `/icon.png` 참조
 
 ### 메타데이터
+
 - ✅ `manifest: "/manifest.json"` 추가
 - ✅ `appleWebApp.capable: true` (iOS standalone 모드)
 - ✅ `appleWebApp.statusBarStyle: "default"`
@@ -366,7 +369,8 @@ Chrome DevTools → Lighthouse:
 - ✅ `formatDetection.telephone: false` (전화번호 자동 링크 방지)
 
 ### 배포 준비
-- ✅ `.gitignore` 확인 (.env*.local, .vercel, .next 포함)
+
+- ✅ `.gitignore` 확인 (.env\*.local, .vercel, .next 포함)
 - ✅ `DEPLOYMENT.md` 작성 (상세한 배포 가이드)
 - ✅ 환경 변수 문서화
 - ✅ GitHub 연동 방법 안내
@@ -375,6 +379,7 @@ Chrome DevTools → Lighthouse:
 - ✅ 문제 해결 가이드
 
 ### 빌드 확인
+
 - ✅ 컴파일 성공 (3초)
 - ✅ manifest.webmanifest 자동 생성
 - ✅ icon, apple-icon 라우트 생성
@@ -385,6 +390,7 @@ Chrome DevTools → Lighthouse:
 사용자가 직접 수행해야 할 작업:
 
 1. **GitHub Repository 생성 및 Push**
+
    ```bash
    git remote add origin https://github.com/username/jageboo-next.git
    git branch -M main

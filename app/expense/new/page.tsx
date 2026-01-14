@@ -25,8 +25,8 @@ export default function NewExpensePage() {
             </Button>
           </Link>
           <h1 className="text-2xl font-bold">매입 입력</h1>
-          <div className={cn("bg-expense-muted rounded-full p-2")}>
-            <TrendingDown className={cn("text-expense h-4 w-4")} />
+          <div className={cn("rounded-full bg-expense-muted p-2")}>
+            <TrendingDown className={cn("h-4 w-4 text-expense")} />
           </div>
         </div>
 

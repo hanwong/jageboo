@@ -1,8 +1,6 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
-
 import { createClient } from "@/lib/supabase/server"
 import {
   transactionFormSchema,
@@ -96,21 +94,11 @@ export async function createTransactionAction(
       }
     }
 
-    // 5. 캐시 갱신 및 리다이렉트
+    // 5. 캐시 갱신
     revalidatePath("/")
-    redirect("/")
-  } catch (error) {
-    // redirect()는 NEXT_REDIRECT 에러를 던지므로 다시 throw
-    if (
-      error &&
-      typeof error === "object" &&
-      "message" in error &&
-      typeof error.message === "string" &&
-      error.message.includes("NEXT_REDIRECT")
-    ) {
-      throw error
-    }
 
+    return { success: true }
+  } catch (error) {
     console.error("Unexpected error:", error)
     return {
       success: false,
@@ -205,22 +193,12 @@ export async function updateTransactionAction(
       }
     }
 
-    // 6. 캐시 갱신 및 리다이렉트
+    // 6. 캐시 갱신
     revalidatePath("/")
     revalidatePath(`/transaction/${id}/edit`)
-    redirect("/")
-  } catch (error) {
-    // redirect()는 NEXT_REDIRECT 에러를 던지므로 다시 throw
-    if (
-      error &&
-      typeof error === "object" &&
-      "message" in error &&
-      typeof error.message === "string" &&
-      error.message.includes("NEXT_REDIRECT")
-    ) {
-      throw error
-    }
 
+    return { success: true }
+  } catch (error) {
     console.error("Unexpected error:", error)
     return {
       success: false,
@@ -274,21 +252,11 @@ export async function deleteTransactionAction(
       }
     }
 
-    // 4. 캐시 갱신 및 리다이렉트
+    // 4. 캐시 갱신
     revalidatePath("/")
-    redirect("/")
-  } catch (error) {
-    // redirect()는 NEXT_REDIRECT 에러를 던지므로 다시 throw
-    if (
-      error &&
-      typeof error === "object" &&
-      "message" in error &&
-      typeof error.message === "string" &&
-      error.message.includes("NEXT_REDIRECT")
-    ) {
-      throw error
-    }
 
+    return { success: true }
+  } catch (error) {
     console.error("Unexpected error:", error)
     return {
       success: false,

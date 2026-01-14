@@ -26,7 +26,7 @@ export function PeriodTabs({
       onValueChange={val => onValueChange(val as Period)}
       className={className}
     >
-      <TabsList className="w-full grid grid-cols-4">
+      <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="daily">일</TabsTrigger>
         <TabsTrigger value="weekly">주</TabsTrigger>
         <TabsTrigger value="monthly">월</TabsTrigger>

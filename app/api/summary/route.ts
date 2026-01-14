@@ -12,10 +12,7 @@ export async function GET(request: NextRequest) {
     const period = searchParams.get("period") as Period
     const dateStr = searchParams.get("date")
 
-    if (
-      !period ||
-      !["daily", "weekly", "monthly", "yearly"].includes(period)
-    ) {
+    if (!period || !["daily", "weekly", "monthly", "yearly"].includes(period)) {
       return NextResponse.json(
         { error: "Invalid period parameter" },
         { status: 400 }
