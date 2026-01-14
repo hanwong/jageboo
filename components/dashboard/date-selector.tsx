@@ -29,7 +29,15 @@ export function DateSelector({
   onChange,
   className,
 }: DateSelectorProps) {
-  const formattedDate = format(value, "yyyy년 M월 d일 (EEE)", { locale: ko })
+  // UTC 날짜를 로컬 날짜로 변환하여 표시
+  const displayDate = new Date(
+    value.getUTCFullYear(),
+    value.getUTCMonth(),
+    value.getUTCDate()
+  )
+  const formattedDate = format(displayDate, "yyyy년 M월 d일 (EEE)", {
+    locale: ko,
+  })
 
   return (
     <div className={cn("flex items-center gap-2 py-3", className)}>
@@ -49,7 +57,7 @@ export function DateSelector({
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            selected={value}
+            selected={displayDate}
             onSelect={date => {
               if (date) {
                 onChange(date)

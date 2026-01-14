@@ -23,9 +23,15 @@ async function DashboardContent() {
   // Dynamic rendering을 위해 connection() 호출
   await connection()
 
+  // 오늘 날짜를 UTC 자정으로 정규화
+  const now = new Date()
+  const today = new Date(
+    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  )
+
   // 오늘의 거래 내역 및 요약 데이터 가져오기
-  const transactions = await getTransactionsByPeriod("daily", new Date())
-  const summary = await getSummaryByPeriod("daily", new Date())
+  const transactions = await getTransactionsByPeriod("daily", today)
+  const summary = await getSummaryByPeriod("daily", today)
   const recurringTransactions = await getAllRecurringTransactions()
 
   return (

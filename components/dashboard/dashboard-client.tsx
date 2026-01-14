@@ -63,9 +63,16 @@ export function DashboardClient({
   initialRecurringTransactions,
 }: DashboardClientProps) {
   const router = useRouter()
+
+  // 오늘 날짜를 UTC 자정으로 정규화
+  const getTodayUTC = () => {
+    const now = new Date()
+    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
+  }
+
   const [periodSelection, setPeriodSelection] = useState<PeriodSelection>({
     type: "daily",
-    date: new Date(),
+    date: getTodayUTC(),
   })
   const [transactions, setTransactions] = useState(initialTransactions)
   const [summary, setSummary] = useState(initialSummary)
@@ -90,7 +97,7 @@ export function DashboardClient({
   const handlePeriodTypeChange = (newType: Period) => {
     setPeriodSelection({
       type: newType,
-      date: newType === "daily" ? new Date() : undefined,
+      date: newType === "daily" ? getTodayUTC() : undefined,
       weekOffset: newType === "weekly" ? 0 : undefined,
       monthOffset: newType === "monthly" ? 0 : undefined,
       yearOffset: newType === "yearly" ? 0 : undefined,
@@ -99,7 +106,13 @@ export function DashboardClient({
 
   // Date change handler (for daily period)
   const handleDateChange = (date: Date) => {
-    setPeriodSelection({ type: "daily", date })
+    // 로컬 타임존의 년/월/일을 추출하여 UTC 자정으로 정규화
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const day = date.getDate()
+    const utcDate = new Date(Date.UTC(year, month, day))
+
+    setPeriodSelection({ type: "daily", date: utcDate })
   }
 
   // Offset change handler (for weekly/monthly/yearly periods)
