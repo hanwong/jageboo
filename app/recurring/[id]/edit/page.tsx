@@ -2,7 +2,6 @@ import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import { AppLayout } from "@/components/layout/app-layout"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { TransactionForm } from "@/components/transaction/transaction-form"
@@ -60,16 +59,7 @@ export default async function RecurringEditPage({
         </div>
 
         {/* 폼 */}
-        <Suspense
-          fallback={
-            <div className="space-y-4">
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-12 w-full" />
-            </div>
-          }
-        >
+        <Suspense fallback={<div>Loading...</div>}>
           <EditFormContent id={id} />
         </Suspense>
       </div>

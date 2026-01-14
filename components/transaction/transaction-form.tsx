@@ -71,6 +71,8 @@ export function TransactionForm({
   const router = useRouter()
   const amountInputRef = useRef<HTMLInputElement>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
+  const hasShownToast = useRef(false)
 
   // 반복 거래 상태
   const [isRecurring, setIsRecurring] = useState(mode === "recurring-edit")
@@ -157,7 +159,7 @@ export function TransactionForm({
 
   // 일반 거래 성공 시 토스트 알림 및 리디렉션
   useEffect(() => {
-    if (actionState.success) {
+    if (actionState.success && !hasShownToast.current) {
       const message =
         mode === "create"
           ? "거래가 저장되었습니다"
@@ -165,21 +167,29 @@ export function TransactionForm({
             ? "반복 거래가 수정되었습니다"
             : "거래가 수정되었습니다"
       toast.success(message)
+      hasShownToast.current = true
+      // 리디렉션 중 상태 활성화
+      setIsRedirecting(true)
       // 홈으로 리디렉션
       router.push("/")
-    } else if (actionState.error) {
+    } else if (actionState.error && !hasShownToast.current) {
       toast.error(actionState.error)
+      hasShownToast.current = true
     }
   }, [actionState.success, actionState.error, mode, router])
 
   // 반복 거래 성공 시 토스트 알림 및 리디렉션
   useEffect(() => {
-    if (recurringActionState.success) {
+    if (recurringActionState.success && !hasShownToast.current) {
       toast.success("반복 거래가 등록되었습니다")
+      hasShownToast.current = true
+      // 리디렉션 중 상태 활성화
+      setIsRedirecting(true)
       // 홈으로 리디렉션
       router.push("/")
-    } else if (recurringActionState.error) {
+    } else if (recurringActionState.error && !hasShownToast.current) {
       toast.error(recurringActionState.error)
+      hasShownToast.current = true
     }
   }, [recurringActionState.success, recurringActionState.error, router])
 
@@ -231,6 +241,7 @@ export function TransactionForm({
         const result = await deleteRecurringTransactionAction(recurringId)
         if (result.success) {
           toast.success("반복 거래가 삭제되었습니다")
+          setIsRedirecting(true)
           router.push("/")
         } else if (result.error) {
           toast.error(result.error)
@@ -246,7 +257,8 @@ export function TransactionForm({
         const result = await deleteTransactionAction(transactionId)
         if (result.success) {
           toast.success("거래가 삭제되었습니다")
-          // redirect가 Server Action에서 처리됨
+          setIsRedirecting(true)
+          router.push("/")
         } else if (result.error) {
           toast.error(result.error)
         }
@@ -406,16 +418,18 @@ export function TransactionForm({
             variant="outline"
             className="flex-1"
             onClick={handleCancel}
-            disabled={isPending || isRecurringPending}
+            disabled={isPending || isRecurringPending || isRedirecting}
           >
             취소
           </Button>
           <Button
             type="submit"
             className="flex-1"
-            disabled={isPending || isRecurringPending}
+            disabled={isPending || isRecurringPending || isRedirecting}
           >
-            {isPending || isRecurringPending ? "저장 중..." : "저장"}
+            {isPending || isRecurringPending || isRedirecting
+              ? "저장 중..."
+              : "저장"}
           </Button>
         </div>
 
@@ -426,7 +440,7 @@ export function TransactionForm({
             variant="destructive"
             className="w-full"
             onClick={() => setShowDeleteDialog(true)}
-            disabled={isPending}
+            disabled={isPending || isRedirecting}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             삭제
