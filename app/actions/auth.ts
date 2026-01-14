@@ -10,8 +10,10 @@ import { redirect } from "next/navigation"
 export async function signInWithGoogle() {
   const supabase = await createClient()
 
-  // 현재 요청의 origin을 기반으로 리디렉션 URL 구성
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  // Vercel 배포 환경에서는 VERCEL_URL 사용, 로컬에서는 localhost 사용
+  const origin = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000"
   const redirectTo = `${origin}/auth/callback`
 
   const { data, error } = await supabase.auth.signInWithOAuth({
