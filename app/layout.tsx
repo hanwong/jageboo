@@ -30,15 +30,6 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
   },
-  // PWA 설정 (manifest.ts가 자동으로 처리함)
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "자장부",
-  },
-  formatDetection: {
-    telephone: false,
-  },
 }
 
 const geistSans = Geist({
