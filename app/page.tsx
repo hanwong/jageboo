@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { connection } from "next/server"
+import { redirect } from "next/navigation"
 import { AppLayout } from "@/components/layout/app-layout"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { DashboardClient } from "@/components/dashboard/dashboard-client"
@@ -36,7 +37,18 @@ async function DashboardContent() {
   )
 }
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const params = await searchParams
+
+  // OAuth callback code가 있으면 /auth/callback으로 리다이렉트
+  if (params.code) {
+    redirect(`/auth/callback?code=${params.code}`)
+  }
+
   // 사용자 인증 상태 확인
   const supabase = await createClient()
   const {
