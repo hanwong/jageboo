@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { format } from "date-fns"
 import { ko } from "date-fns/locale"
 import { Calendar } from "@/components/ui/calendar"
@@ -23,12 +24,15 @@ interface DateSelectorProps {
  * - 팝업 캘린더 (버튼 클릭시 표시)
  * - 선택된 날짜를 한국어로 표시 (예: "2024년 1월 15일 (월)")
  * - 과거/현재/미래 날짜 모두 선택 가능
+ * - 날짜 선택 시 자동으로 닫힘
  */
 export function DateSelector({
   value,
   onChange,
   className,
 }: DateSelectorProps) {
+  const [open, setOpen] = useState(false)
+
   // UTC 날짜를 로컬 날짜로 변환하여 표시
   const displayDate = new Date(
     value.getUTCFullYear(),
@@ -41,7 +45,7 @@ export function DateSelector({
 
   return (
     <div className={cn("flex items-center gap-2 py-3", className)}>
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -61,6 +65,7 @@ export function DateSelector({
             onSelect={date => {
               if (date) {
                 onChange(date)
+                setOpen(false) // 날짜 선택 시 Popover 닫기
               }
             }}
             initialFocus
