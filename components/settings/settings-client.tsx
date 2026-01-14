@@ -30,6 +30,16 @@ export function SettingsClient({ user }: SettingsClientProps) {
       await signOut()
       toast.success("로그아웃되었습니다")
     } catch (error) {
+      // NEXT_REDIRECT 에러는 정상적인 리다이렉트이므로 무시
+      if (
+        error &&
+        typeof error === "object" &&
+        "digest" in error &&
+        typeof error.digest === "string" &&
+        error.digest.includes("NEXT_REDIRECT")
+      ) {
+        return
+      }
       console.error("Logout error:", error)
       toast.error("로그아웃에 실패했습니다")
       setIsLoggingOut(false)

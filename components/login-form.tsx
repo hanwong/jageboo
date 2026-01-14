@@ -65,6 +65,16 @@ export function LoginForm({
     try {
       await signInWithGoogle()
     } catch (error: unknown) {
+      // NEXT_REDIRECT 에러는 정상적인 리다이렉트이므로 무시
+      if (
+        error &&
+        typeof error === "object" &&
+        "digest" in error &&
+        typeof error.digest === "string" &&
+        error.digest.includes("NEXT_REDIRECT")
+      ) {
+        throw error
+      }
       setError(
         error instanceof Error ? error.message : "Google 로그인에 실패했습니다"
       )
