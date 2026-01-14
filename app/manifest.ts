@@ -1,5 +1,8 @@
 import { MetadataRoute } from "next"
 
+// 1시간마다 재검증 (manifest는 자주 변경되지 않음)
+export const revalidate = 3600
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "자장부 - 매입매출 관리",
@@ -10,8 +13,6 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#ffffff",
     theme_color: "#18181b",
     orientation: "portrait-primary",
-    // 아이콘은 public 폴더에 파일이 준비되면 추가
-    // icons: [],
     categories: ["business", "finance", "productivity"],
     lang: "ko-KR",
   }

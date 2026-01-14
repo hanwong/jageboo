@@ -29,6 +29,22 @@ export function LoginForm({
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  // 이미 로그인된 사용자 체크 및 리다이렉트
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (user) {
+        router.push("/")
+      }
+    }
+
+    checkUser()
+  }, [router])
+
   // URL 쿼리 파라미터에서 에러 메시지 확인
   useEffect(() => {
     const errorParam = searchParams.get("error")
