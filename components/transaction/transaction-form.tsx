@@ -107,6 +107,7 @@ export function TransactionForm({
     watch,
     setValue,
     setError,
+    reset,
     formState: { errors },
   } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionFormSchema),
@@ -122,12 +123,18 @@ export function TransactionForm({
 
   // 금액 입력 필드 자동 포커스 및 초기값 설정
   useEffect(() => {
-    // 수정 모드일 때 초기 금액 설정
-    if (initialData?.amount && amountInputRef.current) {
-      amountInputRef.current.value = initialData.amount.toLocaleString("ko-KR")
+    // 수정 모드일 때 초기값 설정
+    if (initialData && (mode === "edit" || mode === "recurring-edit")) {
+      // react-hook-form 전체 폼 상태를 초기값으로 리셋
+      reset(initialData)
+      // input에 포맷된 금액 값 설정
+      if (initialData.amount && amountInputRef.current) {
+        amountInputRef.current.value =
+          initialData.amount.toLocaleString("ko-KR")
+      }
     }
     amountInputRef.current?.focus()
-  }, [initialData])
+  }, [initialData, mode, reset])
 
   // 서버 에러를 폼 필드에 반영 (일반 거래)
   useEffect(() => {
@@ -269,22 +276,26 @@ export function TransactionForm({
     }
   }
 
-  // 금액 입력 핸들러 (콤마 제거 후 숫자로 변환)
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/,/g, "")
-    const numValue = value ? Number(value) : undefined
-    setValue("amount", numValue as number, { shouldValidate: true })
-  }
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* 금액 입력 */}
       <div>
         <AmountInput
           {...register("amount", {
-            onChange: handleAmountChange,
+            setValueAs: v => {
+              // 콤마 제거 후 숫자로 변환
+              if (typeof v === "string") {
+                const num = parseFloat(v.replace(/,/g, ""))
+                return isNaN(num) ? undefined : num
+              }
+              return v
+            },
           })}
-          ref={amountInputRef}
+          ref={(e: HTMLInputElement | null) => {
+            // react-hook-form의 ref와 amountInputRef를 병합
+            register("amount").ref(e)
+            amountInputRef.current = e
+          }}
           label="금액"
           id="amount"
           placeholder="0"
