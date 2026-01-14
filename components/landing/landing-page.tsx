@@ -17,10 +17,10 @@ export function LandingPage() {
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 text-center">
         <div className="mb-8">
           <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-5xl">
-            자영업자 장부
+            자장부
           </h1>
           <p className="text-xl text-muted-foreground">
-            5초 만에 기록하고, 바로 확인하는 영업이익
+            5초 만에 매입매출 기록하고 꿀잠🍯😴
           </p>
         </div>
 
@@ -57,7 +57,7 @@ export function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <p>© 2026 자영업자 장부. All rights reserved.</p>
+        <p>© 2026 자장부. All rights reserved.</p>
       </footer>
     </div>
   )

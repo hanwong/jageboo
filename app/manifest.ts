@@ -2,28 +2,15 @@ import { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "자영업자 장부 - 매입매출 관리",
-    short_name: "자영업자 장부",
-    description: "5초 만에 매입매출을 기록하고 실시간 영업이익을 확인하세요",
+    name: "자장부 - 매입매출 관리",
+    short_name: "자장부",
+    description: "5초 만에 매입매출 기록하고 꿀잠",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#18181b",
     orientation: "portrait-primary",
-    icons: [
-      {
-        src: "/icon.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icon.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "any",
-      },
-    ],
+    icons: [],
     categories: ["business", "finance", "productivity"],
     lang: "ko-KR",
   }

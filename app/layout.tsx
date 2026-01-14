@@ -10,10 +10,11 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "자영업자 장부 - 5초 만에 매입매출 기록",
+  title: "자장부 - 5초 만에 매입매출 기록하고 꿀잠",
   description:
     "1인 자영업자를 위한 초간편 매입/매출 관리 앱. 5초 만에 거래를 기록하고 실시간 영업이익을 확인하세요.",
   keywords: [
+    "자장부",
     "자영업자",
     "장부",
     "매입",
@@ -24,17 +25,16 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Jageboo" }],
   openGraph: {
-    title: "자영업자 장부",
+    title: "자장부",
     description: "5초 만에 매입매출을 기록하고 영업이익을 확인하세요",
     type: "website",
     locale: "ko_KR",
   },
-  // PWA 설정
-  manifest: "/manifest.json",
+  // PWA 설정 (manifest.ts가 자동으로 처리함)
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "자영업자 장부",
+    title: "자장부",
   },
   formatDetection: {
     telephone: false,
