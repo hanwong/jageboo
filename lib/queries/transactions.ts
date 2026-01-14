@@ -102,20 +102,21 @@ export async function getRecentTransactions(
 
 /**
  * 기간별 시작일/종료일 계산 헬퍼 함수
+ * UTC를 사용하여 타임존 문제 방지
  */
 function calculatePeriodDates(
   period: Period,
   date: Date
 ): { startDate: string; endDate: string } {
-  const year = date.getFullYear()
-  const month = date.getMonth()
-  const day = date.getDate()
+  const year = date.getUTCFullYear()
+  const month = date.getUTCMonth()
+  const day = date.getUTCDate()
 
   switch (period) {
     case "daily": {
       // 오늘 하루
-      const startDate = new Date(year, month, day)
-      const endDate = new Date(year, month, day)
+      const startDate = new Date(Date.UTC(year, month, day))
+      const endDate = new Date(Date.UTC(year, month, day))
       return {
         startDate: formatDateToYYYYMMDD(startDate),
         endDate: formatDateToYYYYMMDD(endDate),
@@ -124,10 +125,10 @@ function calculatePeriodDates(
 
     case "weekly": {
       // 이번 주 (월요일 ~ 일요일)
-      const dayOfWeek = date.getDay() // 0(일) ~ 6(토)
+      const dayOfWeek = date.getUTCDay() // 0(일) ~ 6(토)
       const monday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek // 월요일까지의 날짜 차이
-      const startDate = new Date(year, month, day + monday)
-      const endDate = new Date(year, month, day + monday + 6) // 일요일
+      const startDate = new Date(Date.UTC(year, month, day + monday))
+      const endDate = new Date(Date.UTC(year, month, day + monday + 6)) // 일요일
       return {
         startDate: formatDateToYYYYMMDD(startDate),
         endDate: formatDateToYYYYMMDD(endDate),
@@ -136,8 +137,8 @@ function calculatePeriodDates(
 
     case "monthly": {
       // 이번 달 (1일 ~ 말일)
-      const startDate = new Date(year, month, 1)
-      const endDate = new Date(year, month + 1, 0) // 다음 달 0일 = 이번 달 마지막 날
+      const startDate = new Date(Date.UTC(year, month, 1))
+      const endDate = new Date(Date.UTC(year, month + 1, 0)) // 다음 달 0일 = 이번 달 마지막 날
       return {
         startDate: formatDateToYYYYMMDD(startDate),
         endDate: formatDateToYYYYMMDD(endDate),
@@ -146,8 +147,8 @@ function calculatePeriodDates(
 
     case "yearly": {
       // 올해 (1월 1일 ~ 12월 31일)
-      const startDate = new Date(year, 0, 1) // January 1
-      const endDate = new Date(year, 11, 31) // December 31
+      const startDate = new Date(Date.UTC(year, 0, 1)) // January 1
+      const endDate = new Date(Date.UTC(year, 11, 31)) // December 31
       return {
         startDate: formatDateToYYYYMMDD(startDate),
         endDate: formatDateToYYYYMMDD(endDate),
@@ -158,10 +159,11 @@ function calculatePeriodDates(
 
 /**
  * Date 객체를 YYYY-MM-DD 형식 문자열로 변환
+ * UTC를 사용하여 타임존 문제 방지
  */
 function formatDateToYYYYMMDD(date: Date): string {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const day = String(date.getDate()).padStart(2, "0")
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0")
+  const day = String(date.getUTCDate()).padStart(2, "0")
   return `${year}-${month}-${day}`
 }

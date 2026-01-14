@@ -256,6 +256,7 @@ export function DashboardClient({
 
 /**
  * 기간 선택에 따른 시작일/종료일 계산 헬퍼 함수
+ * UTC를 사용하여 타임존 문제 방지
  */
 function calculatePeriodDatesForSelection(selection: PeriodSelection): {
   startDate: string
@@ -270,15 +271,29 @@ function calculatePeriodDatesForSelection(selection: PeriodSelection): {
   } else if (selection.type === "weekly") {
     // Calculate week range based on offset
     const now = new Date()
-    const targetDate = new Date(now)
-    targetDate.setDate(now.getDate() + selection.weekOffset * 7)
+    const year = now.getUTCFullYear()
+    const month = now.getUTCMonth()
+    const day = now.getUTCDate()
+    const targetDate = new Date(
+      Date.UTC(year, month, day + selection.weekOffset * 7)
+    )
 
-    const dayOfWeek = targetDate.getDay()
+    const dayOfWeek = targetDate.getUTCDay()
     const monday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-    const startDate = new Date(targetDate)
-    startDate.setDate(targetDate.getDate() + monday)
-    const endDate = new Date(startDate)
-    endDate.setDate(startDate.getDate() + 6)
+    const startDate = new Date(
+      Date.UTC(
+        targetDate.getUTCFullYear(),
+        targetDate.getUTCMonth(),
+        targetDate.getUTCDate() + monday
+      )
+    )
+    const endDate = new Date(
+      Date.UTC(
+        startDate.getUTCFullYear(),
+        startDate.getUTCMonth(),
+        startDate.getUTCDate() + 6
+      )
+    )
 
     return {
       startDate: formatDateToYYYYMMDD(startDate),
@@ -287,19 +302,11 @@ function calculatePeriodDatesForSelection(selection: PeriodSelection): {
   } else if (selection.type === "monthly") {
     // Calculate month range based on offset
     const now = new Date()
-    const targetDate = new Date(now)
-    targetDate.setMonth(now.getMonth() + selection.monthOffset)
+    const year = now.getUTCFullYear()
+    const month = now.getUTCMonth() + selection.monthOffset
 
-    const startDate = new Date(
-      targetDate.getFullYear(),
-      targetDate.getMonth(),
-      1
-    )
-    const endDate = new Date(
-      targetDate.getFullYear(),
-      targetDate.getMonth() + 1,
-      0
-    )
+    const startDate = new Date(Date.UTC(year, month, 1))
+    const endDate = new Date(Date.UTC(year, month + 1, 0))
 
     return {
       startDate: formatDateToYYYYMMDD(startDate),
@@ -308,10 +315,10 @@ function calculatePeriodDatesForSelection(selection: PeriodSelection): {
   } else if (selection.type === "yearly") {
     // Calculate year range based on offset
     const now = new Date()
-    const targetYear = now.getFullYear() + selection.yearOffset
+    const targetYear = now.getUTCFullYear() + selection.yearOffset
 
-    const startDate = new Date(targetYear, 0, 1) // January 1
-    const endDate = new Date(targetYear, 11, 31) // December 31
+    const startDate = new Date(Date.UTC(targetYear, 0, 1)) // January 1
+    const endDate = new Date(Date.UTC(targetYear, 11, 31)) // December 31
 
     return {
       startDate: formatDateToYYYYMMDD(startDate),
@@ -326,9 +333,13 @@ function calculatePeriodDatesForSelection(selection: PeriodSelection): {
   }
 }
 
+/**
+ * Date 객체를 YYYY-MM-DD 형식 문자열로 변환
+ * UTC를 사용하여 타임존 문제 방지
+ */
 function formatDateToYYYYMMDD(date: Date): string {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const day = String(date.getDate()).padStart(2, "0")
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0")
+  const day = String(date.getUTCDate()).padStart(2, "0")
   return `${year}-${month}-${day}`
 }
