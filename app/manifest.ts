@@ -10,7 +10,8 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#ffffff",
     theme_color: "#18181b",
     orientation: "portrait-primary",
-    icons: [],
+    // 아이콘은 public 폴더에 파일이 준비되면 추가
+    // icons: [],
     categories: ["business", "finance", "productivity"],
     lang: "ko-KR",
   }
