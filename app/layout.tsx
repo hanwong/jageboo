@@ -46,6 +46,26 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
+        <noscript>
+          <div
+            style={{
+              padding: "2rem",
+              textAlign: "center",
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
+            <h1 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
+              JavaScript가 필요합니다
+            </h1>
+            <p style={{ color: "#666" }}>
+              이 앱을 사용하려면 JavaScript를 활성화해주세요.
+            </p>
+            <p style={{ marginTop: "1rem", fontSize: "0.875rem", color: "#999" }}>
+              인스타그램 인앱 브라우저를 사용 중이라면, Safari나 Chrome에서
+              열어주세요.
+            </p>
+          </div>
+        </noscript>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

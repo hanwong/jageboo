@@ -1,0 +1,13 @@
+# 인스타그램 인앱 브라우저 등 구형 브라우저 지원
+[production]
+> 0.2%
+not dead
+not op_mini all
+iOS >= 12
+Safari >= 12
+Chrome >= 80
+
+[development]
+last 1 chrome version
+last 1 firefox version
+last 1 safari version
