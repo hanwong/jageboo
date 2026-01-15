@@ -3,21 +3,11 @@ import { NextResponse, type NextRequest } from "next/server"
 import { hasEnvVars } from "../utils"
 
 export async function updateSession(request: NextRequest) {
-  const userAgent = request.headers.get("user-agent") || ""
-  const isInstagram = userAgent.toLowerCase().includes("instagram")
-
   // 정적 HTML 파일은 무조건 즉시 통과 (쿠키 설정 없이)
   if (request.nextUrl.pathname.endsWith('.html')) {
     return NextResponse.next({
       request,
     })
-  }
-
-  // 인스타그램 브라우저는 안내 페이지로 리다이렉트 (쿠키 설정 없이)
-  if (isInstagram) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/instagram-notice.html"
-    return NextResponse.redirect(url)
   }
 
   let supabaseResponse = NextResponse.next({
