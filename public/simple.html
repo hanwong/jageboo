@@ -3,27 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Simple Test</title>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+  <!-- 일반 콘텐츠 -->
+  <div id="normal-content">
+    <h1 style="color: green;">✓ Success!</h1>
+    <p style="font-size: 18px;">If you can see this page, the basic HTML is working!</p>
+    <p style="color: #666;">This is the simplest possible HTML page.</p>
+    <hr>
+    <p><strong>Next steps:</strong></p>
+    <ol>
+      <li>If this works → Try /test.html</li>
+      <li>If test.html works → Try /debug</li>
+      <li>If debug works → Try main page</li>
+    </ol>
+  </div>
+
+  <!-- 인스타그램 안내 (숨김) -->
+  <div id="instagram-notice" style="display: none; text-align: center;">
+    <h1 style="font-size: 32px; margin-bottom: 20px;">📱</h1>
+    <h2 style="color: #333;">자장부</h2>
+    <p style="color: #666; margin: 20px 0;">
+      인스타그램 앱 내 브라우저에서는<br>
+      일부 기능이 제한됩니다.
+    </p>
+    <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin: 25px 0; text-align: left;">
+      <h3 style="font-size: 16px; margin-bottom: 15px;">외부 브라우저로 여는 방법</h3>
+      <div style="background: white; border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+        <strong>1.</strong> 화면 우측 상단의 <strong>••• 메뉴</strong>를 탭하세요
+      </div>
+      <div style="background: white; border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+        <strong>2.</strong> <strong>"Safari에서 열기"</strong> 또는<br>
+        <strong>"Chrome에서 열기"</strong>를 선택하세요
+      </div>
+      <div style="background: white; border-radius: 8px; padding: 10px;">
+        <strong>3.</strong> 외부 브라우저에서 정상적으로 사용하실 수 있습니다
+      </div>
+    </div>
+    <p style="font-size: 13px; color: #999;">
+      또는 주소를 복사해서<br>
+      Safari나 Chrome에 직접 붙여넣으세요
+    </p>
+  </div>
+
   <script>
-    // 인스타그램 브라우저 감지 및 즉시 리다이렉트
+    // 인스타그램 브라우저 감지
     (function() {
       var ua = navigator.userAgent.toLowerCase();
-      if (ua.indexOf('instagram') > -1) {
-        window.location.replace('/instagram-notice.html');
+      var isInstagram = ua.indexOf('instagram') > -1;
+
+      if (isInstagram) {
+        // 일반 콘텐츠 숨기고 안내 표시
+        document.getElementById('normal-content').style.display = 'none';
+        document.getElementById('instagram-notice').style.display = 'block';
+        console.log('Instagram browser detected - showing notice');
+      } else {
+        console.log('Normal browser - showing content');
       }
     })();
   </script>
-</head>
-<body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
-  <h1 style="color: green;">✓ Success!</h1>
-  <p style="font-size: 18px;">If you can see this page, the basic HTML is working!</p>
-  <p style="color: #666;">This is the simplest possible HTML page with no JavaScript.</p>
-  <hr>
-  <p><strong>Next steps:</strong></p>
-  <ol>
-    <li>If this works → Try /test.html</li>
-    <li>If test.html works → Try /debug</li>
-    <li>If debug works → Try main page</li>
-  </ol>
 </body>
 </html>
