@@ -3,11 +3,118 @@ import { NextResponse, type NextRequest } from "next/server"
 import { hasEnvVars } from "../utils"
 
 export async function updateSession(request: NextRequest) {
+  const userAgent = request.headers.get("user-agent") || ""
+  const isInstagram = userAgent.toLowerCase().includes("instagram")
+
   // 정적 HTML 파일은 무조건 즉시 통과 (쿠키 설정 없이)
   if (request.nextUrl.pathname.endsWith('.html')) {
     return NextResponse.next({
       request,
     })
+  }
+
+  // Instagram 브라우저는 완전히 정적인 HTML 응답 (React 없이)
+  if (isInstagram) {
+    return new NextResponse(
+      `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>자장부 - 외부 브라우저로 열어주세요</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .icon { font-size: 64px; margin-bottom: 20px; }
+    h1 { font-size: 24px; color: #333; margin-bottom: 15px; font-weight: 700; }
+    p { color: #666; line-height: 1.6; margin-bottom: 10px; font-size: 15px; }
+    .steps {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      text-align: left;
+    }
+    .steps h2 { font-size: 16px; color: #333; margin-bottom: 15px; font-weight: 600; }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+    }
+    .step:last-child { margin-bottom: 0; }
+    .step-number {
+      background: #667eea;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-right: 12px;
+    }
+    .step-text { color: #444; font-size: 14px; line-height: 1.5; }
+    .note { font-size: 13px; color: #999; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📱</div>
+    <h1>자장부</h1>
+    <p>인스타그램 앱 내 브라우저에서는<br>일부 기능이 제한됩니다.</p>
+    <div class="steps">
+      <h2>외부 브라우저로 여는 방법</h2>
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-text">화면 우측 상단의 <strong>••• 메뉴</strong>를 탭하세요</div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-text"><strong>"Safari에서 열기"</strong> 또는<br><strong>"Chrome에서 열기"</strong>를 선택하세요</div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-text">외부 브라우저에서 정상적으로 사용하실 수 있습니다</div>
+      </div>
+    </div>
+    <p class="note">또는 주소를 복사해서<br>Safari나 Chrome에 직접 붙여넣으세요</p>
+  </div>
+</body>
+</html>`,
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    )
   }
 
   let supabaseResponse = NextResponse.next({
