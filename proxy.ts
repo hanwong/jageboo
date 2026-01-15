@@ -8,14 +8,25 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * - .html files (static HTML files like test.html)
-     * Feel free to modify this pattern to include more paths.
+     * 인증이 필요한 경로에만 middleware 적용:
+     * - / (홈페이지 - 사용자 확인용)
+     * - /protected/* (보호된 페이지)
+     * - /settings (설정 페이지)
+     * - /api/* (API 라우트)
+     *
+     * 제외:
+     * - /auth/* (로그인/회원가입은 middleware 불필요)
+     * - /_next/* (Next.js 내부 파일)
+     * - /favicon.ico
+     * - /test.html, /simple.html, /instagram-notice.html (정적 파일)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html)$).*)",
+    "/",
+    "/protected/:path*",
+    "/settings/:path*",
+    "/api/:path*",
+    "/income/:path*",
+    "/expense/:path*",
+    "/transaction/:path*",
+    "/recurring/:path*",
   ],
 }
