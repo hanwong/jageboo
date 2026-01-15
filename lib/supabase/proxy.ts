@@ -3,6 +3,13 @@ import { NextResponse, type NextRequest } from "next/server"
 import { hasEnvVars } from "../utils"
 
 export async function updateSession(request: NextRequest) {
+  // 정적 HTML 파일은 즉시 통과
+  if (request.nextUrl.pathname.endsWith('.html')) {
+    return NextResponse.next({
+      request,
+    })
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
