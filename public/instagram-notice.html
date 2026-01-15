@@ -144,6 +144,7 @@
   <script>
     // User Agent 확인 (로그용)
     console.log('User Agent:', navigator.userAgent);
+    console.log('Instagram Notice Page Loaded');
 
     // 일반 브라우저인 경우 자동 리다이렉트
     var ua = navigator.userAgent.toLowerCase();
@@ -151,9 +152,21 @@
 
     if (!isInstagram) {
       // 인스타그램이 아니면 메인 페이지로 리다이렉트
+      console.log('Not Instagram browser, redirecting to home...');
       setTimeout(function() {
         window.location.href = '/';
       }, 1000);
+    } else {
+      console.log('Instagram browser detected - showing notice');
+    }
+
+    // 외부 브라우저로 열기 버튼 클릭 시
+    var button = document.querySelector('.button');
+    if (button) {
+      button.addEventListener('click', function(e) {
+        console.log('Open in external browser clicked');
+        // 인스타그램에서는 자동으로 외부 브라우저 메뉴가 표시되도록
+      });
     }
   </script>
 </body>
