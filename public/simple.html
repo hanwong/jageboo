@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simple Test</title>
+  <script>
+    // 인스타그램 브라우저 감지 및 즉시 리다이렉트
+    (function() {
+      var ua = navigator.userAgent.toLowerCase();
+      if (ua.indexOf('instagram') > -1) {
+        window.location.replace('/instagram-notice.html');
+      }
+    })();
+  </script>
 </head>
 <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
   <h1 style="color: green;">✓ Success!</h1>

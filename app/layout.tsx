@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist } from "next/font/google"
 import { ThemeProvider } from "next-themes"
 import { Toaster } from "@/components/ui/sonner"
+import Script from "next/script"
 import "./globals.css"
 
 const defaultUrl = process.env.VERCEL_URL
@@ -46,6 +47,21 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
+        <Script
+          id="instagram-detector"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              // 인스타그램 브라우저 감지 및 즉시 리다이렉트
+              (function() {
+                var ua = navigator.userAgent.toLowerCase();
+                if (ua.indexOf('instagram') > -1 && window.location.pathname !== '/instagram-notice.html') {
+                  window.location.replace('/instagram-notice.html');
+                }
+              })();
+            `,
+          }}
+        />
         <noscript>
           <div
             style={{
